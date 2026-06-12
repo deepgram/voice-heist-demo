@@ -1,24 +1,37 @@
-# Voice Heist Demo
+<div align="center">
 
-**Talk an AI gatekeeper into bending its one rule, by voice, in your browser.** Sweet-talk a goofy pizza bot into a free pie, out-argue a deadpan bouncer, slip past a Kafkaesque phone tree. A complete, low-latency voice-agent app built on the [Deepgram Voice Agent API](https://developers.deepgram.com/docs/voice-agent).
+# Voice Heist
+
+**Talk an AI gatekeeper into bending its one rule, by voice, in your browser.**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-22e3b5.svg)](LICENSE)
+[![Built with Deepgram Voice Agent API](https://img.shields.io/badge/built%20with-Deepgram%20Voice%20Agent%20API-13ef93)](https://developers.deepgram.com/docs/voice-agent)
+[![Join the Deepgram Discord](https://img.shields.io/badge/Discord-join%20the%20community-5865F2?logo=discord&logoColor=white)](https://discord.gg/deepgram)
+
+</div>
 
 > [!TIP]
-> **Play it in two minutes.** Grab a free Deepgram API key ($200 in credit, no card), run `npm run dev`, and start talking. [Get a key](https://console.deepgram.com/signup)
+> **Play it in two minutes.** Grab a free Deepgram API key ($200 in credit), clone the repo, run `npm run dev`, and start talking. [Get a key](https://console.deepgram.com/signup)
 
-![Voice Heist gameplay](assets/gameplay.svg)
+<p align="center">
+  <img src="assets/gameplay.svg" alt="Voice Heist gameplay: a player talks Vince the bouncer into the club by pointing to a checkable guest list, and the turn scores WARM" width="100%">
+</p>
 
-This is the public version of the Voice Heist booth game: the same gameplay, voice loop, scoring, and leaderboard, with the booth-only layer (device gate, OAuth, prize tracking, admin tooling) removed so you can clone, run, and deploy your own in minutes. The prize-based experience stays exclusive to the Deepgram booth.
+Voice Heist is a complete, low-latency voice-agent app built on the [Deepgram Voice Agent API](https://developers.deepgram.com/docs/voice-agent), and the public, open-source version of the game we run at the Deepgram booth. Sweet-talk a goofy pizza bot into a free pie, out-argue a deadpan bouncer, or slip past a Kafkaesque phone tree. The booth-only layer (device gate, OAuth, prize tracking, admin) is stripped out, so you can clone, run, and deploy your own in minutes.
 
-## What you'll learn
+## What you'll build
 
 A real, end-to-end pattern for shipping a voice agent on the Deepgram Voice Agent API:
 
-* Low-latency browser audio with the `@deepgram/agents` SDK
-* Multi-agent orchestration and handoffs over a single WebSocket
-* Function calling that drives real outcomes (`grant_request` / `deny_request`)
-* Turn-by-turn conversation scoring that fails soft
-* A privacy-preserving identity: codenames on the board, never PII
-* Short-lived token minting, so your API key never reaches the browser
+* **Low-latency browser audio** with the `@deepgram/agents` SDK, where the audio loop is Deepgram-managed and never touches your server
+* **Multi-agent orchestration and handoffs** between a Host, a Briefer, and four gatekeepers ([two handoff strategies, and why](ARCHITECTURE.md#three-agents-two-handoff-strategies))
+* **Function calling that drives real outcomes** (`grant_request` / `deny_request`)
+* **A resilient think layer**: an ordered LLM fallback chain across two vendors, so an outage degrades the game instead of killing it
+* **Turn-by-turn scoring that fails soft**: a separate judge call that defaults to a safe minimum, never blocking play
+* **A privacy-preserving identity**: codenames on the board, never PII
+* **Short-lived token minting**, so your Deepgram API key never reaches the browser
+
+Want the whole design in one read? Start with **[ARCHITECTURE.md](ARCHITECTURE.md)**.
 
 ## The heists
 
@@ -31,7 +44,9 @@ Each gatekeeper guards one rule. You get a few turns to talk it into bending, by
 | The Receptionist | Globex Receptionist (Kafkaesque) | Reach a human |
 | The List | Vince, the Bouncer (deadpan) | Get into the club |
 
-## Architecture
+Want know know the rules? See [HOW_TO_PLAY.md](HOW_TO_PLAY.md).
+
+## How it works
 
 The browser is the hub: it holds the low-latency audio WebSocket straight to Deepgram and a separate JSON control WebSocket to the Python brain. No audio passes through your server, and the Deepgram API key never reaches the browser (the brain mints a short-lived token).
 
@@ -49,9 +64,11 @@ Browser   (Vite client + @deepgram/agents SDK)
     └── store    SQLite: players, plays, leaderboard
 ```
 
+That's the 10,000-foot view. For the details on the handoff strategies, the LLM fallback chain, the voice-prompting patterns, and the fail-soft judge, check **[ARCHITECTURE.md](ARCHITECTURE.md)**.
+
 ## Quickstart
 
-You need a free Deepgram key ($200 credit, no card) at [console.deepgram.com/signup](https://console.deepgram.com/signup), with at least Member permissions so it can mint tokens. An Anthropic key is optional; it powers the conversation scoring judge.
+You need a free Deepgram key ($200 credit, no card) at [console.deepgram.com/signup](https://console.deepgram.com/signup), with at least Member permissions so it can mint tokens. An Anthropic key is optional; it powers the conversation-scoring judge.
 
 ```bash
 git clone https://github.com/deepgram/voice-heist-demo
@@ -66,6 +83,15 @@ npm run dev                                 # brain on :8000, client on :5173
 ```
 
 Open the URL Vite prints (typically http://localhost:5173), click **Connect & Talk**, allow the mic, and start talking.
+
+## Troubleshooting
+
+| Symptom | Fix |
+| --- | --- |
+| **The mic won't connect** | Browsers only allow microphone capture on a secure context. `localhost` works as-is; on a LAN IP or a remote host you need HTTPS. Also confirm the browser actually granted the mic permission. |
+| **Saying "connect" does nothing** | The hands-free wake word uses the browser's built-in speech recognizer (Chrome, Edge, Safari). Firefox doesn't ship one, so just click **Connect & Talk**. The conversation itself works in every modern browser. |
+| **Every turn scores 100, never WARM or WIN** | No `ANTHROPIC_API_KEY` is set, so the scoring judge falls back to the minimum. Add the key for graded scoring; the game runs fine either way. |
+| **`Failed to mint token` or "Invalid credentials"** | The `DEEPGRAM_API_KEY` needs at least **Member** permissions to mint tokens. Check that `GET /api/deepgram-token` returns `200`. |
 
 ## Optional player accounts
 
@@ -90,11 +116,11 @@ DEEPGRAM_API_KEY=<your-key>
 Optional:
 
 ```bash
-ANTHROPIC_API_KEY=<your-key>
-VH_SIGNING_SECRET=<long-random-secret>
+ANTHROPIC_API_KEY=<your-key>             # enables graded turn scoring
+VH_SIGNING_SECRET=<long-random-secret>   # keeps sign-in cookies valid across restarts
 ```
 
-If player sign-in is enabled, set `VH_SIGNING_SECRET` so authentication cookies stay valid across restarts. Never commit secrets or API keys.
+Without `ANTHROPIC_API_KEY` the game still runs; every turn just scores the minimum. If player sign-in is enabled, set `VH_SIGNING_SECRET` so authentication cookies stay valid across restarts and can't be forged. Never commit secrets or API keys.
 
 ## Project structure
 
@@ -103,36 +129,44 @@ If player sign-in is enabled, set `VH_SIGNING_SECRET` so authentication cookies 
 
 ```text
 brain/
-├── app.py           # FastAPI application and API endpoints
-├── auth.py          # Optional player registration and sign-in
-├── agents.py        # Agent definitions, prompts, voices, and settings
-├── session.py       # Game orchestration and agent routing
-├── judge.py         # Conversation scoring engine
+├── app.py           # FastAPI app: token minting, leaderboard, the /ws/brain control socket
+├── auth.py          # Optional, PII-free player registration and sign-in
+├── agents.py        # Source of truth: prompts, voices, function schemas, Settings builders
+├── session.py       # Game orchestration: routing, handoffs, turn cap, scoring, win/lose
+├── judge.py         # Separate, fail-soft per-turn scoring call
 ├── store.py         # SQLite persistence layer
 └── schema.sql
 
 client/
-├── index.html       # Main application
+├── index.html       # The game
+├── leaderboard.html # The public leaderboard page
 └── src/
-    ├── game.js      # Voice interaction loop
-    ├── voice.js
-    ├── ui.js
-    ├── sfx.js
+    ├── game.js      # Voice loop: Deepgram session, directives, the two handoff strategies
+    ├── voice.js     # Pre-connect wake word (the only non-Deepgram recognizer)
+    ├── ui.js        # Rendering
+    ├── sfx.js       # Sound
     ├── leaderboard.js
     ├── auth.js
     ├── identity.css
     └── main.js
 ```
+
+See **[ARCHITECTURE.md](ARCHITECTURE.md)** for how these fit together.
 </details>
 
 ## Security
 
-Voice Heist follows a server-side credential model:
+Voice Heist keeps every long-lived secret on the server:
 
-* Deepgram API keys remain on the backend
-* Browsers receive only short-lived access tokens
-* Authentication cookies are signed and validated server-side
-* No long-lived credentials are exposed to client applications
+* Deepgram API keys stay on the backend; the browser gets only short-lived (300s) tokens
+* Sign-in cookies are signed and validated server-side
+* No audio, and no long-lived credentials, ever reach the client
+
+Found a vulnerability? See **[SECURITY.md](SECURITY.md)** and please don't open a public issue.
+
+## Contributing
+
+Issues and PRs are welcome, see **[CONTRIBUTING.md](CONTRIBUTING.md)** for setup, scope, and guidelines. We follow the [Contributor Covenant](CODE_OF_CONDUCT.md). For "how do I build X with Deepgram" questions, the [Deepgram Discord](https://discord.gg/deepgram) is the fastest place to get help.
 
 ## License
 
@@ -144,6 +178,7 @@ MIT. See the [LICENSE](LICENSE) file.
   Built with the <a href="https://developers.deepgram.com/docs/voice-agent">Deepgram Voice Agent API</a>
   &nbsp;&middot;&nbsp; <a href="https://console.deepgram.com/signup">Get a free key</a>
   &nbsp;&middot;&nbsp; <a href="https://developers.deepgram.com/">Docs</a>
-  <br>
+  &nbsp;&middot;&nbsp; <a href="https://discord.gg/deepgram">Discord</a>
+  <br><br>
   Built something with it? Give the repo a star.
 </p>
