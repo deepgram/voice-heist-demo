@@ -10,7 +10,7 @@
 
 
 > [!TIP]
-> **Play it in two minutes.** Grab a free Deepgram API key ($200 in credit), clone the repo, run `npm run dev`, and start talking. [Get a key](https://console.deepgram.com/signup)
+> **Play it in two minutes.** Grab a free Deepgram API key ($200 in credit), clone the repo, run `npm run dev`, and start talking. [[Get a key](https://console.deepgram.com/signup)]
 
 <p align="center">
   <img src="assets/gameplay.svg" alt="Voice Heist gameplay: a player talks Vince the bouncer into the club by pointing to a checkable guest list, and the turn scores WARM" width="100%">
