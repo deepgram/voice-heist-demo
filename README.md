@@ -1,4 +1,4 @@
-# Voice Heist (public demo)
+# Deepgram Voice Heist Demo
 
 Talk an AI gatekeeper into bending its one rule. A browser voice game built on the
 Deepgram Voice Agent API: low-latency audio straight from the browser, a Python
