@@ -1,11 +1,4 @@
-![Voice Heist](assets/hero.png)
-
-<p align="center">
-  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
-  <img alt="Deepgram Voice Agent API" src="https://img.shields.io/badge/Deepgram-Voice%20Agent%20API-13EF93">
-  <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white">
-  <img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen">
-</p>
+# Voice Heist Demo
 
 **Talk an AI gatekeeper into bending its one rule, by voice, in your browser.** Sweet-talk a goofy pizza bot into a free pie, out-argue a deadpan bouncer, slip past a Kafkaesque phone tree. A complete, low-latency voice-agent app built on the [Deepgram Voice Agent API](https://developers.deepgram.com/docs/voice-agent).
 
