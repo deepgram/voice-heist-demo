@@ -1,8 +1,10 @@
 # Deepgram Voice Heist Demo
 
+![Voice Heist](assets/hero.svg)
+
 A voice-first AI security challenge built with the Deepgram Voice Agent API.
 
-In Voice Heist, players attempt to persuade an AI gatekeeper to break its single rule. Each scenario presents a different challenge that tests conversational strategy, reasoning, and persuasion skills through real-time voice interactions.
+In Voice Heist, players attempt to persuade an AI gatekeeper to break its single rule. Each heist presents a different challenge that tests conversational strategy, reasoning, and persuasion skills through real-time voice interactions.
 
 This repository contains the public version of the Voice Heist experience. The core gameplay, voice interactions, and scoring system are included, while event-specific components such as booth authentication, device restrictions, prize tracking, and administrative tooling have been removed.
 
@@ -170,6 +172,7 @@ client/
     ├── sfx.js
     ├── leaderboard.js
     ├── auth.js
+    ├── identity.css
     └── main.js
 ```
 
