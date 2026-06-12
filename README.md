@@ -43,6 +43,19 @@ Open the URL Vite prints (default http://localhost:5173), click "Connect & Talk"
 allow the mic, and start talking. Keep your keys server-side: the brain holds
 `DEEPGRAM_API_KEY` and hands the browser only a short-lived token.
 
+## Keep your standings on the leaderboard (optional)
+
+Play is anonymous by default, with no sign-up needed. To make your scores stick
+across visits and land on the daily leaderboard under a codename, expand **"Keep
+your standings on the leaderboard?"** in the lobby and sign up with your name and
+email. You get a public codename (like "Crimson Fox 42") and a short code, then you
+can come back any time and sign in with your **email or that code** to pick up where
+you left off.
+
+Your name and email are stored only to recognize you on a return visit. The public
+leaderboard shows the codename only, never your name or email. Prefer to stay
+anonymous? Just skip it and play.
+
 ## Deploy your own
 
 The included `Dockerfile` builds the client and serves everything from the Python
@@ -74,11 +87,10 @@ Removed for the public demo: the device gate (`vh_gate`), the "sign in with any
 account" OAuth/OIDC flow, and the admin portal. Anyone can play immediately as a
 fresh anonymous player.
 
-What's kept is a lightweight, optional identity: sign up with a name + email to get
-a short code and a public codename ("Crimson Fox 42"), then sign in later with your
-email or that code to keep your standings. The name and email are stored only to
-recognize a returning player — the public leaderboard shows the codename, never your
-name or email.
+In place of the booth's verified accounts, the demo keeps the lightweight, optional
+name+email sign-up described above ("Keep your standings"): play anonymously, or get
+a codename on the leaderboard. Either way the public board shows codenames only,
+never your name or email.
 
 ## License
 
