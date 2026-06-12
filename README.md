@@ -1,4 +1,4 @@
-<div align="center">
+
 
 # Voice Heist
 
@@ -8,7 +8,6 @@
 [![Built with Deepgram Voice Agent API](https://img.shields.io/badge/built%20with-Deepgram%20Voice%20Agent%20API-13ef93)](https://developers.deepgram.com/docs/voice-agent)
 [![Join the Deepgram Discord](https://img.shields.io/badge/Discord-join%20the%20community-5865F2?logo=discord&logoColor=white)](https://discord.gg/deepgram)
 
-</div>
 
 > [!TIP]
 > **Play it in two minutes.** Grab a free Deepgram API key ($200 in credit), clone the repo, run `npm run dev`, and start talking. [Get a key](https://console.deepgram.com/signup)
