@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voice Heist — High Scores</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&family=Orbitron:wght@600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg:#07090f; --card:#11161f; --card2:#1a2130; --line:#2b3346;
+        --ink:#eaf2ff; --muted:#8b97ad; --green:#13ef93; --pink:#ee028c;
+        --blue:#14a9fb; --gold:#ffd45e;
+      }
+      * { box-sizing:border-box; }
+      html, body { margin:0; min-height:100vh; }
+      body {
+        color:var(--ink); font:16px/1.5 Inter, system-ui, sans-serif;
+        padding:clamp(20px,3.5vw,52px); overflow-x:hidden;
+        background:
+          radial-gradient(1200px 760px at 82% -12%, color-mix(in srgb, var(--pink) 16%, transparent) 0%, transparent 60%),
+          radial-gradient(1200px 760px at 8% 0%, color-mix(in srgb, var(--green) 14%, transparent) 0%, transparent 55%),
+          var(--bg);
+      }
+      /* CRT scanlines + vignette */
+      body::before { content:""; position:fixed; inset:0; z-index:50; pointer-events:none;
+        background:radial-gradient(125% 125% at 50% 50%, transparent 55%, rgba(0,0,0,.6) 100%); }
+      body::after { content:""; position:fixed; inset:0; z-index:51; pointer-events:none; opacity:.4;
+        background:repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,.18) 3px, rgba(0,0,0,0) 4px); }
+
+      .head { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:30px; flex-wrap:wrap; }
+      .brand { font-family:Orbitron, sans-serif; font-weight:800; letter-spacing:5px; color:var(--green);
+        font-size:clamp(15px,2vw,22px); text-shadow:0 0 10px color-mix(in srgb, var(--green) 60%, transparent); }
+      .title { font-family:Orbitron, sans-serif; font-weight:900; letter-spacing:6px; margin:0;
+        font-size:clamp(30px,6vw,72px);
+        background:linear-gradient(180deg, #fff, var(--green)); -webkit-background-clip:text; background-clip:text; color:transparent;
+        filter:drop-shadow(0 0 26px color-mix(in srgb, var(--green) 45%, transparent)); }
+      .updated { font-family:Orbitron, sans-serif; color:var(--muted); font-size:13px; letter-spacing:1px; }
+
+      .days { display:grid; grid-template-columns:repeat(auto-fit, minmax(360px, 1fr)); gap:clamp(16px,2vw,30px); align-items:start; }
+      .day { background:linear-gradient(180deg, var(--card), color-mix(in srgb, var(--card) 80%, #000));
+        border:1px solid var(--line); border-radius:20px; padding:clamp(16px,1.6vw,26px);
+        box-shadow:0 20px 60px rgba(0,0,0,.45); position:relative; overflow:hidden; animation:popIn .4s ease-out both; }
+      .day.latest { border-color:color-mix(in srgb, var(--green) 55%, var(--line));
+        box-shadow:0 0 30px color-mix(in srgb, var(--green) 22%, transparent), 0 20px 60px rgba(0,0,0,.45); }
+      .day-head { display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+        margin-bottom:16px; padding-bottom:12px; border-bottom:1px dashed var(--line); }
+      .day-date { font-family:Orbitron, sans-serif; font-weight:700; letter-spacing:2px;
+        font-size:clamp(15px,1.7vw,20px); text-transform:uppercase; }
+      .day-tag { font-family:Orbitron, sans-serif; font-size:11px; font-weight:700; letter-spacing:2px; color:#07110b;
+        background:var(--green); border-radius:999px; padding:4px 10px; box-shadow:0 0 14px color-mix(in srgb, var(--green) 60%, transparent); }
+
+      .row { display:grid; grid-template-columns:54px 1fr auto; align-items:center; gap:14px; padding:12px; border-radius:12px; }
+      .row + .row { margin-top:6px; }
+      .row.top3 { background:var(--card2); }
+      .rank { font-family:Orbitron, sans-serif; font-weight:900; font-size:20px; text-align:center; color:var(--muted); }
+      .row[data-rank="1"] .rank, .row[data-rank="2"] .rank, .row[data-rank="3"] .rank { font-size:26px; }
+      .name { font-family:Orbitron, sans-serif; font-weight:700; font-size:clamp(16px,1.6vw,20px); letter-spacing:1px;
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      .score { font-family:Orbitron, sans-serif; font-weight:800; font-size:clamp(17px,1.7vw,22px); color:var(--green);
+        text-shadow:0 0 12px color-mix(in srgb, var(--green) 45%, transparent); }
+      .row[data-rank="1"] { border:1px solid color-mix(in srgb, var(--gold) 60%, transparent);
+        box-shadow:0 0 22px color-mix(in srgb, var(--gold) 28%, transparent); background:color-mix(in srgb, var(--gold) 8%, var(--card2)); }
+      .row[data-rank="1"] .name, .row[data-rank="1"] .score { color:var(--gold);
+        text-shadow:0 0 14px color-mix(in srgb, var(--gold) 45%, transparent); }
+
+      .empty, .loading { color:var(--muted); text-align:center; padding:80px 0; font-size:20px;
+        font-family:Orbitron, sans-serif; letter-spacing:2px; }
+      .foot { margin-top:34px; text-align:center; color:var(--green); font-family:Orbitron, sans-serif; letter-spacing:3px;
+        font-size:clamp(12px,1.4vw,15px); text-transform:uppercase; animation:blink 1.6s steps(2,start) infinite;
+        text-shadow:0 0 12px color-mix(in srgb, var(--green) 45%, transparent); }
+      .powered-by { margin-top:18px; text-align:center; font-family:"Fira Code", ui-monospace, monospace;
+        font-size:12px; letter-spacing:1px; color:var(--muted); }
+      .powered-by span { color:var(--green); }
+      @keyframes blink { 50% { opacity:.4; } }
+      @keyframes popIn { from { transform:scale(.97); opacity:0; } to { transform:scale(1); opacity:1; } }
+    </style>
+  </head>
+  <body>
+    <div class="head">
+      <div class="brand">&#9673; VOICE HEIST</div>
+      <h1 class="title">HIGH SCORES</h1>
+      <div class="updated" id="updated">LOADING…</div>
+    </div>
+    <div id="board"><p class="loading">LOADING…</p></div>
+    <p class="foot">&#9654; Step up to the booth &middot; talk your way past the AI &middot; top the board</p>
+    <div class="powered-by">Powered by <span>&#9673; Deepgram Voice Agent API</span></div>
+    <script type="module" src="/src/leaderboard.js"></script>
+  </body>
+</html>

@@ -1,0 +1,1316 @@
+/* Voice Heist styling, built on the Deepgram design system (@deepgram/styles).
+   Uses Deepgram tokens (--color-dg-*, --font-dg-*, --radius/spacing/shadow-dg-*)
+   and the real .dg-btn / .dg-card components; this file adds game layout. */
+
+:root {
+  color-scheme: dark; /* force the dark theme for light-dark() tokens */
+
+  --vh-bg: var(--color-dg-background);
+  --vh-panel: var(--color-dg-charcoal);
+  --vh-panel-2: color-mix(in srgb, var(--color-dg-charcoal) 70%, var(--color-dg-pebble));
+  --vh-border: var(--color-dg-border);
+  --vh-text: var(--color-dg-text);
+  --vh-muted: var(--color-dg-muted);
+  --vh-primary: var(--color-dg-primary);
+  --vh-secondary: var(--color-dg-secondary);
+  --vh-win: var(--color-dg-success);
+  --vh-lose: var(--color-dg-danger);
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+body {
+  background:
+    radial-gradient(900px 600px at 78% -12%, color-mix(in srgb, var(--vh-secondary) 16%, transparent) 0%, transparent 60%),
+    radial-gradient(900px 600px at 12% 0%, color-mix(in srgb, var(--vh-primary) 12%, transparent) 0%, transparent 55%),
+    var(--vh-bg);
+  color: var(--vh-text);
+  font-family: var(--font-dg-sans);
+}
+
+#app {
+  max-width: 1080px;
+  margin: 0 auto;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 18px clamp(16px, 4vw, 40px) 24px;
+}
+
+/* ---- Big-screen / TV mode -------------------------------------------------
+   The booth kiosk may run on a large landscape TV, where the 1080px-wide design
+   would otherwise sit as a small island with desk-sized text. `zoom` scales the
+   whole UI (layout, type, orb, overlays) up proportionally so it fills the screen
+   and reads from across the room. Tuned to the viewport HEIGHT — the binding
+   constraint for this layout — so it never overflows vertically, and gated on
+   width too, so laptops and portrait touch kiosks are left untouched. */
+@media (min-width: 1700px) and (min-height: 1040px) {
+  body { zoom: 1.2; }
+}
+@media (min-width: 2300px) and (min-height: 1320px) {
+  body { zoom: 1.6; }
+}
+@media (min-width: 3000px) and (min-height: 1760px) {
+  body { zoom: 2.2; }
+}
+
+/* Top bar */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-dg-mono);
+}
+.brand-mark {
+  color: var(--vh-primary);
+  font-size: 22px;
+}
+.brand-name {
+  font-weight: 600;
+  letter-spacing: 4px;
+  font-size: 18px;
+}
+.topbar-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+/* "New player" — hand the booth kiosk to the next person (clears the session). */
+.newplayer-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-dg-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--vh-secondary);
+  background: color-mix(in srgb, var(--vh-secondary) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--vh-secondary) 45%, transparent);
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.newplayer-btn:hover {
+  background: color-mix(in srgb, var(--vh-secondary) 18%, transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--vh-secondary) 30%, transparent);
+}
+.conn-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-dg-mono);
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--vh-muted);
+  background: var(--vh-panel);
+  border: 1px solid var(--vh-border);
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+.conn-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-dg-pebble);
+}
+.conn-chip[data-state="connecting"] .conn-dot {
+  background: var(--color-dg-warning);
+}
+.conn-chip[data-state="listening"] {
+  color: var(--vh-primary);
+}
+.conn-chip[data-state="listening"] .conn-dot {
+  background: var(--vh-primary);
+  box-shadow: 0 0 10px var(--vh-primary);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.conn-chip[data-state="speaking"] {
+  color: var(--vh-secondary);
+}
+.conn-chip[data-state="speaking"] .conn-dot {
+  background: var(--vh-secondary);
+  box-shadow: 0 0 10px var(--vh-secondary);
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Stage: lobby is a centered column; call is a two-column layout */
+.stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  padding-top: 10px;
+}
+#app[data-phase="call"] .stage {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  /* Both columns share one row height; align-content:start keeps that row at the
+     taller column's content height (the left rail, ending at the action buttons)
+     rather than stretching to the footer. The chat column then matches it. */
+  align-items: stretch;
+  align-content: start;
+  gap: 28px;
+  padding-top: 18px;
+}
+/* Lobby: a centered two-column stage — orb + Connect CTA on the left, the heist
+   menu (header above a single stacked card column) on the right. Vertically
+   centered so it stays balanced for any number of heists (1–4). */
+#app[data-phase="lobby"] .stage {
+  display: grid;
+  grid-template-columns: minmax(300px, 430px) minmax(340px, 520px);
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: clamp(28px, 5vw, 72px);
+  padding: 0 0 16px;
+}
+#app[data-phase="lobby"] .lobby-panel {
+  max-width: none;
+}
+
+/* Hero */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+.orb-stack {
+  position: relative;
+  line-height: 0;
+}
+#orb {
+  width: 240px;
+  height: 240px;
+  transition: width 0.3s ease, height 0.3s ease;
+}
+#app[data-phase="call"] #orb {
+  width: 190px;
+  height: 190px;
+}
+.agent-name {
+  font-family: var(--font-dg-noto);
+  font-size: 22px;
+  font-weight: 700;
+}
+.status {
+  color: var(--vh-muted);
+  font-size: 14px;
+  margin: 0;
+  max-width: 420px;
+  min-height: 20px;
+}
+.turn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-dg-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--vh-text);
+  background: var(--vh-panel);
+  border: 1px solid var(--vh-border);
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+.turn-pill.hidden {
+  display: none;
+}
+.turn-dots {
+  letter-spacing: 3px;
+  color: var(--vh-primary);
+}
+.hero-cta {
+  margin-top: 6px;
+}
+#app[data-connected="true"] .hero-cta {
+  display: none;
+}
+
+/* Wake-word prompt under the CTA: shown while the page listens for "Connect". */
+.voice-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--vh-muted);
+}
+.voice-hint[hidden] {
+  display: none;
+}
+#app[data-connected="true"] .voice-hint {
+  display: none;
+}
+.voice-hint strong {
+  color: var(--vh-text);
+  font-weight: 600;
+}
+.voice-hint-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--vh-primary);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--vh-primary) 70%, transparent);
+  animation: voiceHintPulse 1.6s ease-out infinite;
+}
+@keyframes voiceHintPulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--vh-primary) 60%, transparent); }
+  70% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--vh-primary) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--vh-primary) 0%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .voice-hint-dot { animation: none; }
+}
+
+/* Lobby: heist selection */
+.lobby-panel {
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.panel-head {
+  text-align: left;
+}
+.panel-title {
+  font-family: var(--font-dg-noto);
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+.panel-sub {
+  color: var(--vh-muted);
+  font-size: 14px;
+  margin: 0;
+}
+.panel-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.howto-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--vh-primary) 40%, transparent);
+  background: color-mix(in srgb, var(--vh-primary) 10%, transparent);
+  color: var(--vh-primary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.howto-link:hover {
+  background: color-mix(in srgb, var(--vh-primary) 18%, transparent);
+}
+@media (max-width: 560px) {
+  .howto-link span,
+  .howto-link {
+    font-size: 11px;
+  }
+}
+.heist-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+.heist-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  padding: 16px;
+  border-radius: var(--radius-dg-lg);
+  border: 1px solid var(--vh-border);
+  background: var(--vh-panel);
+  color: var(--vh-text);
+  font-family: var(--font-dg-sans);
+  cursor: pointer;
+  transition: border-color 0.18s ease, transform 0.06s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+.heist-card:hover:not(:disabled) {
+  border-color: var(--vh-primary);
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--vh-primary) 16%, transparent);
+}
+.heist-card:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.heist-card:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.heist-icon {
+  font-size: 30px;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-dg-md);
+  background: var(--vh-panel-2);
+}
+.heist-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.heist-title {
+  font-family: var(--font-dg-noto);
+  font-weight: 600;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.heist-tone {
+  font-family: var(--font-dg-mono);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--vh-secondary);
+  border: 1px solid color-mix(in srgb, var(--vh-secondary) 40%, transparent);
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+/* Difficulty-ladder badge ("LVL 0".."LVL 3") on each heist card. */
+.heist-level {
+  font-family: var(--font-dg-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  color: var(--color-dg-on-solid);
+  background: var(--vh-primary);
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+.heist-gk {
+  font-size: 12px;
+  color: var(--vh-muted);
+}
+.heist-goal {
+  font-size: 13px;
+  color: var(--vh-text);
+}
+.heist-status {
+  flex-shrink: 0;
+  align-self: flex-start;
+  font-family: var(--font-dg-mono);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--vh-primary) 50%, transparent);
+  color: var(--vh-primary);
+}
+.heist-card[data-status="win"] {
+  border-color: color-mix(in srgb, var(--vh-win) 50%, var(--vh-border));
+}
+.heist-card[data-status="win"] .heist-status {
+  color: var(--color-dg-on-solid);
+  background: var(--vh-win);
+  border-color: var(--vh-win);
+}
+.heist-card[data-status="lose"] .heist-status {
+  color: var(--color-white);
+  background: var(--vh-lose);
+  border-color: var(--vh-lose);
+}
+.heist-card[data-status="unavailable"] .heist-status {
+  color: var(--vh-muted);
+  border-color: var(--vh-border);
+}
+.heist-card[data-status="unavailable"] {
+  opacity: 0.4;
+}
+/* Played today: locked until tomorrow. Greyed (via :disabled) + a diagonal
+   "slashed out" line + a visible caption (no hover tooltips on a touch kiosk). */
+.heist-card.played {
+  position: relative;
+  overflow: hidden;
+}
+.heist-card.played .heist-goal {
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--vh-muted) 60%, transparent);
+}
+.heist-card.played::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    to top right,
+    transparent calc(50% - 0.75px),
+    color-mix(in srgb, var(--vh-muted) 45%, transparent) calc(50% - 0.75px),
+    color-mix(in srgb, var(--vh-muted) 45%, transparent) calc(50% + 0.75px),
+    transparent calc(50% + 0.75px)
+  );
+}
+.heist-locked {
+  display: none;
+}
+.heist-card.played .heist-locked {
+  display: block;
+  font-family: var(--font-dg-mono);
+  font-size: 11px;
+  letter-spacing: 0.4px;
+  color: var(--vh-muted);
+  margin-top: 3px;
+}
+.how-to {
+  text-align: center;
+  font-size: 13px;
+  color: var(--vh-muted);
+  margin: 4px 0 0;
+}
+.how-to strong {
+  color: var(--vh-text);
+}
+
+/* In-call panel */
+.call-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.brief {
+  background: var(--vh-panel);
+  border: 1px solid var(--vh-border);
+  border-radius: var(--radius-dg-lg);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-dg-sm);
+}
+.brief-kicker {
+  font-family: var(--font-dg-mono);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--vh-secondary);
+}
+.brief h2 {
+  margin: 4px 0 6px;
+  font-family: var(--font-dg-noto);
+  font-size: 19px;
+  font-weight: 700;
+}
+.brief p {
+  margin: 0 0 10px;
+  color: var(--vh-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.brief-goals {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.brief-goals li {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--vh-primary);
+}
+/* Themed quote cue: a toast that pops in when a heist starts. */
+.cue-toast {
+  position: fixed;
+  left: 50%;
+  top: 18px;
+  transform: translate(-50%, -16px);
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  max-width: min(440px, 92vw);
+  padding: 12px 20px;
+  border-radius: 999px;
+  text-align: center;
+  background: color-mix(in srgb, var(--vh-panel) 92%, var(--vh-primary) 8%);
+  border: 1px solid color-mix(in srgb, var(--vh-primary) 50%, transparent);
+  box-shadow: 0 10px 32px color-mix(in srgb, var(--vh-bg) 70%, transparent),
+    0 0 18px color-mix(in srgb, var(--vh-primary) 22%, transparent);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  pointer-events: none;
+}
+.cue-toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+.cue-toast[hidden] {
+  display: none;
+}
+.cue-kicker {
+  font-family: var(--font-dg-mono);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--vh-primary);
+}
+.cue-text {
+  font-family: var(--font-dg-noto);
+  font-size: 15px;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--vh-text);
+}
+.cue-text::before { content: "\201C"; }
+.cue-text::after { content: "\201D"; }
+.transcript {
+  background: var(--vh-bg);
+  border: 1px solid var(--vh-border);
+  border-radius: var(--radius-dg-lg);
+  padding: 16px;
+  /* Fill the wrap absolutely so a long conversation scrolls INSIDE a fixed box
+     instead of growing the card past the left rail. Border/radius/padding/colors
+     and the bubble styling below are unchanged. */
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+/* The chat card stretches to the shared row height (see the call-phase .stage
+   rule), so its bottom lines up with the left rail's action buttons. The wrap is
+   the relatively-positioned, height-bounded scroll box for the transcript. */
+.transcript-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+#app[data-phase="call"] .call-panel {
+  min-height: 0;
+}
+.turn {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 88%;
+}
+.turn-user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+.turn-who {
+  font-size: 11px;
+  color: var(--vh-muted);
+  letter-spacing: 0.4px;
+}
+.turn-text {
+  background: var(--vh-panel-2);
+  color: var(--vh-text);
+  padding: 9px 13px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.turn-user .turn-text {
+  background: var(--vh-primary);
+  color: var(--color-dg-on-solid);
+  font-weight: 500;
+}
+.turn-system {
+  align-self: center;
+  color: var(--vh-muted);
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 0;
+}
+
+/* Phase visibility */
+#app[data-phase="lobby"] .call-panel {
+  display: none;
+}
+#app[data-phase="call"] .lobby-panel {
+  display: none;
+}
+
+/* Controls — a stacked dock in the left rail (beneath the orb), shown only in a
+   call. Mute + Back are the routine controls; "Finish" ends the session for the
+   next visitor, so it's split off by a divider and tinted as the rare exit. */
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 240px;
+  margin-top: 18px;
+}
+#app[data-phase="lobby"] .controls {
+  display: none;
+}
+#app[data-phase="call"] .controls .dg-btn {
+  width: 100%;
+  justify-content: center;
+}
+.controls-sep {
+  height: 1px;
+  width: 100%;
+  background: var(--vh-border);
+  margin: 4px 0;
+}
+.controls .dg-btn--exit {
+  color: var(--vh-muted);
+}
+.controls .dg-btn--exit:hover:not(:disabled) {
+  color: #ff6b6b;
+  border-color: color-mix(in srgb, #ff6b6b 45%, var(--vh-border));
+}
+.btn-ic {
+  display: inline-flex;
+  align-items: center;
+}
+.btn-ic svg {
+  display: block;
+}
+.mic-hint {
+  color: var(--vh-muted);
+  font-size: 12px;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.mic-hint-icon {
+  color: var(--vh-secondary);
+}
+
+/* Result overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--vh-bg) 78%, transparent);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.overlay.hidden {
+  display: none;
+}
+.result-card.dg-card {
+  width: min(440px, 90vw);
+  margin: 0;
+  text-align: center;
+  align-items: center;
+}
+.result-badge {
+  display: inline-block;
+  font-family: var(--font-dg-mono);
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+.badge-win {
+  background: var(--vh-win);
+  color: var(--color-dg-on-solid);
+}
+.badge-lose {
+  background: var(--vh-lose);
+  color: var(--color-white);
+}
+.result-card h2 {
+  margin: 0 0 10px;
+  font-family: var(--font-dg-noto);
+  font-size: 22px;
+  font-weight: 700;
+}
+.result-path {
+  color: var(--vh-primary);
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+.result-reason {
+  color: var(--vh-muted);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0 0 22px;
+}
+.result-hint {
+  text-align: left;
+  margin: 0 0 22px;
+  padding: 12px 14px;
+  border-radius: var(--radius-dg-lg);
+  background: color-mix(in srgb, var(--vh-primary) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--vh-primary) 35%, transparent);
+  color: var(--vh-text);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.result-hint::before {
+  content: "The move you missed";
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 700;
+  color: var(--vh-primary);
+}
+.result-hint[hidden] {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  #app[data-phase="lobby"] .stage,
+  #app[data-phase="call"] .stage {
+    grid-template-columns: 1fr;
+  }
+  #app[data-phase="lobby"] .stage {
+    align-content: start;
+  }
+  .heist-grid {
+    grid-template-columns: 1fr;
+  }
+  .mic-hint {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+/* Auth overlay (player sign-in), reusing .overlay + .dg-card */
+.auth-card.dg-card {
+  width: min(420px, 92vw);
+  margin: 0;
+  text-align: center;
+  align-items: center;
+}
+.auth-brand {
+  font-family: var(--font-dg-mono);
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-size: 13px;
+  color: var(--vh-primary);
+  margin-bottom: 14px;
+}
+.auth-card h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-dg-noto);
+  font-size: 21px;
+  font-weight: 700;
+}
+.auth-sub {
+  color: var(--vh-muted);
+  font-size: 14px;
+  margin: 0 0 18px;
+}
+/* "Sign in with Deepgram" is an <a> styled as a full-width primary button. */
+.auth-cta {
+  width: 100%;
+  justify-content: center;
+  text-decoration: none;
+}
+.auth-form {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+.auth-form + .auth-form {
+  margin-top: 10px;
+}
+.auth-input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 13px;
+  border-radius: 10px;
+  border: 1px solid var(--color-dg-border, #2b3346);
+  background: var(--color-dg-surface, #0f1420);
+  color: var(--vh-ink, #e7ecf3);
+  font-size: 15px;
+}
+.auth-input:focus {
+  outline: none;
+  border-color: var(--vh-primary);
+}
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--vh-muted);
+  font-size: 12px;
+  margin: 14px 0;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-dg-border, #2b3346);
+}
+.auth-error {
+  color: var(--vh-lose, #ff5c7a);
+  font-size: 13px;
+  min-height: 18px;
+  margin: 12px 0 0;
+}
+.auth-foot {
+  color: var(--vh-muted);
+  font-size: 12px;
+  margin: 16px 0 0;
+  line-height: 1.5;
+}
+
+/* How-to-play modal, reusing .overlay + .dg-card */
+.howto-card.dg-card {
+  width: min(520px, 92vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  margin: 0;
+  text-align: left;
+}
+.howto-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.howto-head h2 {
+  margin: 0;
+  font-family: var(--font-dg-noto);
+  font-size: 22px;
+  font-weight: 700;
+}
+.howto-close {
+  background: none;
+  border: none;
+  color: var(--vh-muted);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.howto-close:hover {
+  color: var(--vh-text);
+}
+.howto-rule {
+  color: var(--vh-muted);
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 12px 0 18px;
+}
+.howto-rule strong {
+  color: var(--vh-text);
+}
+.howto-list {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.howto-list li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.howto-ic {
+  font-size: 22px;
+  line-height: 1.3;
+  flex-shrink: 0;
+}
+.howto-text {
+  font-size: 14px;
+  line-height: 1.5;
+}
+.howto-text strong {
+  color: var(--vh-text);
+}
+.howto-tip {
+  display: block;
+  margin-top: 3px;
+}
+.howto-win,
+.howto-lose {
+  font-size: 13px;
+}
+.howto-win {
+  color: var(--vh-primary);
+}
+.howto-lose {
+  color: var(--vh-muted);
+  margin-left: 12px;
+}
+.howto-card .dg-btn {
+  width: 100%;
+}
+
+/* Score HUD (live during a heist) + final score on the result card */
+.score-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-dg-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--vh-text);
+  background: var(--vh-panel);
+  border: 1px solid color-mix(in srgb, var(--vh-primary) 45%, var(--vh-border));
+  padding: 5px 14px;
+  border-radius: 999px;
+}
+.score-pill.hidden {
+  display: none;
+}
+.score-ic {
+  color: var(--vh-primary);
+}
+.score-value {
+  color: var(--vh-primary);
+  font-size: 15px;
+}
+.score-unit {
+  color: var(--vh-muted);
+  font-size: 11px;
+}
+.score-pop {
+  position: absolute;
+  right: 10px;
+  top: -12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--vh-primary);
+  opacity: 0;
+  pointer-events: none;
+}
+.score-pop[data-tier="weak"] {
+  color: var(--vh-muted);
+}
+.score-pop.show {
+  animation: scorePop 1.05s ease-out;
+}
+@keyframes scorePop {
+  0% { opacity: 0; transform: translateY(6px) scale(0.9); }
+  25% { opacity: 1; transform: translateY(-2px) scale(1.12); }
+  100% { opacity: 0; transform: translateY(-18px) scale(1); }
+}
+.result-score {
+  font-family: var(--font-dg-mono);
+  font-weight: 700;
+  font-size: 30px;
+  color: var(--vh-primary);
+  margin: 0 0 12px;
+}
+.result-score[hidden] {
+  display: none;
+}
+.result-who {
+  font-family: var(--font-dg-mono);
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  color: var(--vh-muted);
+  margin: 0 0 16px;
+}
+.result-who[hidden] {
+  display: none;
+}
+
+/* ===========================================================================
+   ARCADE SKIN — tasteful neon on the existing Deepgram theme (booth mode).
+   Same palette + orb; adds a display font, CRT atmosphere, neon glow, and
+   punchy score/result juice. Everything below layers on top without changing
+   the layout. ============================================================= */
+:root {
+  --font-arcade: "Orbitron", var(--font-dg-sans);
+}
+
+/* CRT atmosphere over everything (non-interactive) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9996;
+  pointer-events: none;
+  background: radial-gradient(125% 125% at 50% 50%, transparent 56%, rgba(0, 0, 0, 0.55) 100%);
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  pointer-events: none;
+  opacity: 0.45;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.16) 3px,
+    rgba(0, 0, 0, 0) 4px
+  );
+}
+
+/* Brand mark + titles: neon */
+.brand-name {
+  font-family: var(--font-arcade);
+  letter-spacing: 5px;
+  text-shadow:
+    0 0 8px color-mix(in srgb, var(--vh-primary) 55%, transparent),
+    0 0 22px color-mix(in srgb, var(--vh-primary) 28%, transparent);
+}
+.brand-mark {
+  text-shadow: 0 0 12px var(--vh-primary);
+}
+.panel-title {
+  font-family: var(--font-arcade);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--vh-secondary) 45%, transparent);
+}
+.agent-name {
+  text-shadow: 0 0 16px color-mix(in srgb, var(--vh-primary) 25%, transparent);
+}
+
+/* Connect CTA: pulsing "press to play" glow */
+.hero-cta {
+  font-family: var(--font-arcade);
+  letter-spacing: 1px;
+  animation: ctaPulse 2.1s ease-in-out infinite;
+}
+@keyframes ctaPulse {
+  0%, 100% { box-shadow: 0 0 14px color-mix(in srgb, var(--vh-primary) 40%, transparent); }
+  50% { box-shadow: 0 0 28px color-mix(in srgb, var(--vh-primary) 78%, transparent); }
+}
+
+/* Heist cards: arcade select grid */
+.heist-title {
+  font-family: var(--font-arcade);
+  letter-spacing: 0.5px;
+}
+.heist-card:hover:not(:disabled) {
+  box-shadow:
+    0 0 0 1px var(--vh-primary),
+    0 10px 32px color-mix(in srgb, var(--vh-primary) 26%, transparent);
+}
+
+/* Turn + score chips: neon glow + arcade type */
+.turn-pill,
+.score-pill {
+  box-shadow: 0 0 16px color-mix(in srgb, var(--vh-primary) 16%, transparent);
+}
+.score-pill {
+  font-family: var(--font-arcade);
+}
+.score-value {
+  font-family: var(--font-arcade);
+  font-weight: 800;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--vh-primary) 55%, transparent);
+}
+.score-pop {
+  font-family: var(--font-arcade);
+  font-weight: 800;
+}
+.score-pop[data-tier="warm"] {
+  text-shadow: 0 0 12px color-mix(in srgb, var(--vh-primary) 70%, transparent);
+}
+
+/* Big "ALMOST!" cue when the 500 tier is hit mid-call */
+.score-cue {
+  position: fixed;
+  left: 50%;
+  top: 36%;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.6);
+  font-family: var(--font-arcade);
+  font-weight: 900;
+  letter-spacing: 4px;
+  font-size: clamp(30px, 7vw, 68px);
+  color: var(--vh-primary);
+  text-shadow:
+    0 0 18px var(--vh-primary),
+    0 0 46px color-mix(in srgb, var(--vh-primary) 55%, transparent);
+}
+.score-cue.show {
+  animation: cuePop 1.15s ease-out;
+}
+@keyframes cuePop {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+  18% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  70% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -62%) scale(1); }
+}
+
+/* Result moment: big arcade win/lose */
+.result-badge {
+  font-family: var(--font-arcade);
+  letter-spacing: 3px;
+}
+.badge-win {
+  box-shadow: 0 0 26px color-mix(in srgb, var(--vh-primary) 70%, transparent);
+}
+.badge-lose {
+  box-shadow: 0 0 26px color-mix(in srgb, var(--vh-lose) 60%, transparent);
+}
+.result-card h2 {
+  font-family: var(--font-arcade);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.result-score {
+  font-family: var(--font-arcade);
+  font-weight: 900;
+  font-size: 46px;
+  text-shadow: 0 0 20px color-mix(in srgb, var(--vh-primary) 60%, transparent);
+}
+.result-who {
+  font-family: var(--font-arcade);
+  letter-spacing: 1px;
+}
+
+/* Confetti / FX canvas (win burst) */
+#fxCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-cta { animation: none; }
+  .score-cue.show { animation-duration: 0.01s; }
+  body::before { animation: none; }
+}
+
+/* Attribution footer (shared look across all pages). */
+.powered-by {
+  text-align: center;
+  padding: 12px 0 8px;
+  font-family: var(--font-dg-mono);
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  color: var(--vh-muted);
+}
+.powered-by span {
+  color: var(--vh-primary);
+}
+
+/* Persistent arcade score in the top bar — shown on every screen. */
+.score-hud {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.score-hud-label {
+  font-family: var(--font-dg-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--vh-muted);
+}
+.score-hud-value {
+  font-family: var(--font-arcade);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--vh-primary);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--vh-primary) 55%, transparent);
+}
+.score-hud-pop {
+  position: absolute;
+  right: 0;
+  top: -15px;
+  font-family: var(--font-arcade);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--vh-primary);
+  opacity: 0;
+  pointer-events: none;
+}
+.score-hud-pop[data-tier="weak"] {
+  color: var(--vh-muted);
+}
+.score-hud-pop.show {
+  animation: scoreHudPop 1.05s ease-out;
+}
+@keyframes scoreHudPop {
+  0% { opacity: 0; transform: translateY(6px) scale(0.9); }
+  25% { opacity: 1; transform: translateY(-2px) scale(1.15); }
+  100% { opacity: 0; transform: translateY(-16px) scale(1); }
+}
+@media (max-width: 560px) {
+  .score-hud-label { display: none; }
+}
+
+/* Coaching hint pop — appears centered in the orb after an off-track turn. */
+.hint-pop {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 40;
+  width: max-content;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 22px;
+  border-radius: 16px;
+  text-align: left;
+  background: color-mix(in srgb, var(--vh-panel) 92%, var(--vh-primary) 8%);
+  border: 1px solid color-mix(in srgb, var(--vh-primary) 50%, transparent);
+  box-shadow:
+    0 12px 32px color-mix(in srgb, var(--vh-bg) 72%, transparent),
+    0 0 18px color-mix(in srgb, var(--vh-primary) 22%, transparent);
+  opacity: 0;
+  transform: translateY(14px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.hint-pop[hidden] {
+  display: none;
+}
+.hint-pop.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.hint-pop-kicker {
+  font-family: var(--font-dg-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--vh-primary);
+}
+.hint-pop-text {
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--vh-text);
+}

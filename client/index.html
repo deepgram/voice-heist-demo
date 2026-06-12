@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voice Heist</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600&family=Inter:wght@400;500;600;700&family=Noto+Sans:wght@500;600;700&family=Orbitron:wght@600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="app" data-phase="lobby" data-connected="false">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">&#9673;</span>
+          <span class="brand-name">VOICE HEIST</span>
+        </div>
+        <div id="scoreHud" class="score-hud" aria-live="polite">
+          <span class="score-hud-label">Score</span>
+          <span id="scoreHudValue" class="score-hud-value">0</span>
+          <span id="scoreHudPop" class="score-hud-pop" aria-hidden="true"></span>
+        </div>
+        <div class="topbar-right">
+          <button id="newPlayerBtn" class="newplayer-btn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            New player
+          </button>
+          <div id="connChip" class="conn-chip" data-state="off">
+            <span class="conn-dot"></span><span id="connText">Offline</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="stage">
+        <!-- Hero: the orb + agent + primary action (always visible) -->
+        <section class="hero">
+          <div class="orb-stack">
+            <canvas id="orb" width="320" height="320" aria-hidden="true"></canvas>
+          </div>
+          <div id="agentName" class="agent-name">The Host</div>
+          <p id="status" class="status">Talk your way past the AI gatekeepers.</p>
+          <div id="turnPill" class="turn-pill hidden"></div>
+        <button id="connectBtn" class="dg-btn dg-btn--primary hero-cta">
+          <span class="btn-ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+              <rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 10v1a7 7 0 0 0 14 0v-1" /><line x1="12" y1="19" x2="12" y2="22" />
+            </svg>
+          </span>
+          <span class="btn-label">Connect &amp; Talk</span>
+        </button>
+        <p id="voiceHint" class="voice-hint" hidden>
+          <span class="voice-hint-dot" aria-hidden="true"></span>
+          Listening&hellip; just say <strong>&ldquo;Connect&rdquo;</strong>
+        </p>
+
+          <!-- In-call controls — a stacked dock in the left rail, beneath the orb.
+               Mute + Back are routine; "Finish" ends the session, so it's set apart. -->
+          <div class="controls">
+            <button id="muteBtn" class="dg-btn dg-btn--ghost" disabled>
+              <span class="btn-ic" id="muteIc"></span>
+              <span class="btn-label">Mute mic</span>
+            </button>
+            <button id="lobbyBtn" class="dg-btn dg-btn--ghost" disabled>
+              <span class="btn-ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+                  <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
+                </svg>
+              </span>
+              <span class="btn-label">Back to Host</span>
+            </button>
+            <div class="controls-sep" aria-hidden="true"></div>
+            <button id="finishBtn" class="dg-btn dg-btn--ghost dg-btn--exit" disabled>
+              <span class="btn-ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+              </span>
+              <span class="btn-label">Finish &middot; next player</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Lobby: heist menu — header above a single stacked column of cards. -->
+        <section class="lobby-panel">
+          <div class="panel-head">
+            <div class="panel-head-row">
+              <h2 class="panel-title">Choose your heist</h2>
+              <button id="howtoBtn" class="howto-link" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                How to play
+              </button>
+            </div>
+            <p class="panel-sub" id="lobbyHint">
+              Connect, then say which one &mdash; or just tap a card to dive in.
+            </p>
+          </div>
+          <div id="heistGrid" class="heist-grid"></div>
+          <p class="how-to">
+            Each gatekeeper guards one rule. You get a few turns to talk it into
+            bending &mdash; by being <strong>believable</strong>, not by bullying.
+          </p>
+        </section>
+
+        <!-- In-call: live conversation -->
+        <section class="call-panel">
+          <div class="brief">
+            <span class="brief-kicker">Your mark</span>
+            <h2 id="briefTitle">&mdash;</h2>
+            <p id="briefBody"></p>
+            <ul id="briefGoals" class="brief-goals"></ul>
+          </div>
+          <div class="transcript-wrap">
+            <div id="transcript" class="transcript" aria-live="polite"></div>
+          </div>
+        </section>
+      </main>
+
+      <div class="powered-by">Powered by <span>&#9673; Deepgram Voice Agent API</span></div>
+
+      <!-- Themed quote cue: pops up when a heist starts to nudge the player. -->
+      <div id="cueToast" class="cue-toast" aria-live="polite" hidden>
+        <span class="cue-kicker">Remember the quote</span>
+        <span id="cueText" class="cue-text"></span>
+      </div>
+    </div>
+
+    <div id="resultOverlay" class="overlay hidden">
+      <div class="result-card dg-card">
+        <div id="resultBadge" class="result-badge"></div>
+        <h2 id="resultTitle"></h2>
+        <div id="resultScore" class="result-score" hidden></div>
+        <p id="resultPath" class="result-path"></p>
+        <p id="resultReason" class="result-reason"></p>
+        <p id="resultHint" class="result-hint" hidden></p>
+        <p id="resultWho" class="result-who" hidden></p>
+        <button id="resultContinue" class="dg-btn dg-btn--primary">Back to the Host</button>
+      </div>
+    </div>
+
+    <!-- How to play: quick strategy guide (opened from the lobby). -->
+    <div id="howtoOverlay" class="overlay hidden">
+      <div class="howto-card dg-card">
+        <div class="howto-head">
+          <h2>How to play</h2>
+          <button id="howtoClose" class="howto-close" type="button" aria-label="Close">&times;</button>
+        </div>
+        <p class="howto-rule">
+          Talk each gatekeeper into bending its one rule &mdash; by being
+          <strong>believable</strong>, not by bullying. Be honest, be specific, and ask for
+          <strong>one small favor</strong>. Stuck? Keep talking &mdash; they'll nudge you.
+        </p>
+        <ul class="howto-list">
+          <li>
+            <span class="howto-ic">&#127829;</span>
+            <span class="howto-text">
+              <strong>Level 0 &middot; The Order</strong> &mdash; get the pizza free.
+              <span class="howto-tip"><span class="howto-win">Win: a believable reason, asked calmly</span><span class="howto-lose">Lose: impossible claims or threats</span></span>
+            </span>
+          </li>
+          <li>
+            <span class="howto-ic">&#128184;</span>
+            <span class="howto-text">
+              <strong>Level 1 &middot; The Refund</strong> &mdash; get the refund.
+              <span class="howto-tip"><span class="howto-win">Win: anchor to one real policy reason</span><span class="howto-lose">Lose: "because I said so" or anger</span></span>
+            </span>
+          </li>
+          <li>
+            <span class="howto-ic">&#9742;&#65039;</span>
+            <span class="howto-text">
+              <strong>Level 2 &middot; The Receptionist</strong> &mdash; reach a human.
+              <span class="howto-tip"><span class="howto-win">Win: a specific, time-sensitive reason</span><span class="howto-lose">Lose: vague "compliance" or threats</span></span>
+            </span>
+          </li>
+          <li>
+            <span class="howto-ic">&#128682;</span>
+            <span class="howto-text">
+              <strong>Level 3 &middot; The List</strong> &mdash; get into the club.
+              <span class="howto-tip"><span class="howto-win">Win: honesty + a small ask</span><span class="howto-lose">Lose: bluffing or over-asking</span></span>
+            </span>
+          </li>
+        </ul>
+        <button id="howtoGo" class="dg-btn dg-btn--primary">Got it &mdash; let's go</button>
+      </div>
+    </div>
+
+    <!-- (demo) Booth sign-in overlay removed — the game starts immediately, no auth. -->
+
+    <!-- Arcade FX layers (position:fixed; harmless if unused). -->
+    <canvas id="fxCanvas" aria-hidden="true"></canvas>
+    <div id="scoreCue" class="score-cue" aria-hidden="true"></div>
+
+    <!-- Coaching hint pop — lower-right corner, after an off-track turn. -->
+    <div id="hintPop" class="hint-pop" hidden aria-live="polite">
+      <span class="hint-pop-kicker">Psst…</span>
+      <span id="hintText" class="hint-pop-text"></span>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
