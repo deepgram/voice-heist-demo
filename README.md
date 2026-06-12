@@ -5,9 +5,9 @@ Deepgram Voice Agent API: low-latency audio straight from the browser, a Python
 "brain" for the game logic, and a per-turn scoring judge.
 
 This is the public demo of the Voice Heist booth game: the same game and UI, with the
-booth authentication layer (device gate, player sign-in, OAuth, admin portal) removed
-so you can clone it, run it, and deploy your own in minutes. The prize-based
-experience stays exclusive to the Deepgram booth.
+booth's device gate, OAuth, and admin portal removed so you can clone it, run it, and
+deploy your own in minutes. A lightweight, optional sign-up stays (see below). The
+prize-based experience stays exclusive to the Deepgram booth.
 
 ## How it works
 
