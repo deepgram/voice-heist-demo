@@ -19,9 +19,9 @@ The application combines:
 * Persistent leaderboards and player profiles
 * Secure token-based authentication for browser clients
 
-### Game Scenarios
+### Heists
 
-Players can attempt one of four AI challenges:
+Players can attempt one of four AI heists:
 
 * **The Order**
 * **The Refund**
