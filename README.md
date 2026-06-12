@@ -1,6 +1,5 @@
-# Deepgram Voice Heist Demo
-
 ![Voice Heist](assets/hero.svg)
+
 
 A voice-first AI security challenge built with the Deepgram Voice Agent API.
 
