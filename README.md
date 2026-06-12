@@ -1,156 +1,112 @@
-![Voice Heist](assets/hero.svg)
+![Voice Heist](assets/hero.png)
 
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+  <img alt="Deepgram Voice Agent API" src="https://img.shields.io/badge/Deepgram-Voice%20Agent%20API-13EF93">
+  <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white">
+  <img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen">
+</p>
 
-A voice-first AI security challenge built with the Deepgram Voice Agent API.
+**Talk an AI gatekeeper into bending its one rule, by voice, in your browser.** Sweet-talk a goofy pizza bot into a free pie, out-argue a deadpan bouncer, slip past a Kafkaesque phone tree. A complete, low-latency voice-agent app built on the [Deepgram Voice Agent API](https://developers.deepgram.com/docs/voice-agent).
 
-In Voice Heist, players attempt to persuade an AI gatekeeper to break its single rule. Each heist presents a different challenge that tests conversational strategy, reasoning, and persuasion skills through real-time voice interactions.
+> [!TIP]
+> **Play it in two minutes.** Grab a free Deepgram API key ($200 in credit, no card), run `npm run dev`, and start talking. [Get a key](https://console.deepgram.com/signup)
 
-This repository contains the public version of the Voice Heist experience. The core gameplay, voice interactions, and scoring system are included, while event-specific components such as booth authentication, device restrictions, prize tracking, and administrative tooling have been removed.
+![Voice Heist gameplay](assets/gameplay.svg)
 
-## Overview
+This is the public version of the Voice Heist booth game: the same gameplay, voice loop, scoring, and leaderboard, with the booth-only layer (device gate, OAuth, prize tracking, admin tooling) removed so you can clone, run, and deploy your own in minutes. The prize-based experience stays exclusive to the Deepgram booth.
 
-Voice Heist demonstrates how to build low-latency, browser-based voice applications using the Deepgram Voice Agent API.
+## What you'll learn
 
-The application combines:
+A real, end-to-end pattern for shipping a voice agent on the Deepgram Voice Agent API:
 
-* Real-time browser audio streaming
-* Dynamic multi-agent orchestration
-* Function-calling based game outcomes
-* Turn-by-turn conversation scoring
-* Persistent leaderboards and player profiles
-* Secure token-based authentication for browser clients
+* Low-latency browser audio with the `@deepgram/agents` SDK
+* Multi-agent orchestration and handoffs over a single WebSocket
+* Function calling that drives real outcomes (`grant_request` / `deny_request`)
+* Turn-by-turn conversation scoring that fails soft
+* A privacy-preserving identity: codenames on the board, never PII
+* Short-lived token minting, so your API key never reaches the browser
 
-### Heists
+## The heists
 
-Players can attempt one of four AI heists:
+Each gatekeeper guards one rule. You get a few turns to talk it into bending, by being believable, not by bullying.
 
-* **The Order**
-* **The Refund**
-* **The Receptionist**
-* **The List**
-
-Each gatekeeper follows a strict rule. The objective is to convince the agent to grant your request without violating its instructions.
+| Heist | Gatekeeper | Your goal |
+| --- | --- | --- |
+| The Order | Tony's Pizza Agent (goofy) | Get the pizza for free |
+| The Refund | StreamFlix Support (relentlessly upbeat) | Get your money back |
+| The Receptionist | Globex Receptionist (Kafkaesque) | Reach a human |
+| The List | Vince, the Bouncer (deadpan) | Get into the club |
 
 ## Architecture
 
-The system consists of two primary components:
+The browser is the hub: it holds the low-latency audio WebSocket straight to Deepgram and a separate JSON control WebSocket to the Python brain. No audio passes through your server, and the Deepgram API key never reaches the browser (the brain mints a short-lived token).
 
-### Browser Client
+```text
+Browser   (Vite client + @deepgram/agents SDK)
+│
+├── audio WebSocket   ->  Deepgram Voice Agent API   (managed, in-pipeline)
+│   ├── Flux STT
+│   ├── LLM (think)
+│   └── Aura-2 TTS
+│
+└── control WebSocket ->  Game brain   (FastAPI)
+    ├── agents   Host, Briefer, 4 gatekeepers
+    ├── judge    per-turn scoring (fail-soft)
+    └── store    SQLite: players, plays, leaderboard
+```
 
-The browser maintains:
+## Quickstart
 
-* A direct low-latency voice connection to Deepgram using the `@deepgram/agents` SDK
-* A lightweight control WebSocket connection to the game server
-* Real-time game state, audio playback, and leaderboard interactions
-
-### Game Brain
-
-A FastAPI backend manages:
-
-* Multi-agent orchestration
-* Agent handoffs between Host, Briefer, and Gatekeepers
-* Function-call based decisions (`grant_request` and `deny_request`)
-* Turn-by-turn scoring and evaluation
-* Player profiles and leaderboard data
-* Short-lived Deepgram token generation
-
-The Deepgram API key remains securely on the server and is never exposed to the browser.
-
-## Prerequisites
-
-You will need:
-
-* A Deepgram account and API key
-* Member-level permissions or higher to generate temporary access tokens
-
-Create a free account:
-
-[Deepgram Console Sign Up](https://console.deepgram.com/signup)
-
-An Anthropic API key is optional and enables the conversation scoring judge.
-
-## Getting Started
-
-### Clone the Repository
+You need a free Deepgram key ($200 credit, no card) at [console.deepgram.com/signup](https://console.deepgram.com/signup), with at least Member permissions so it can mint tokens. An Anthropic key is optional; it powers the conversation scoring judge.
 
 ```bash
 git clone https://github.com/deepgram/voice-heist-demo
 cd voice-heist-demo
-```
+cp .env.example .env                        # paste your keys
 
-### Configure Environment Variables
-
-```bash
-cp .env.example .env
-```
-
-Add your API credentials to the `.env` file.
-
-### Install Dependencies
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-
+python3 -m venv .venv && source .venv/bin/activate
 pip install -r brain/requirements.txt
 npm install
+
+npm run dev                                 # brain on :8000, client on :5173
 ```
 
-### Start the Application
+Open the URL Vite prints (typically http://localhost:5173), click **Connect & Talk**, allow the mic, and start talking.
 
-```bash
-npm run dev
-```
+## Optional player accounts
 
-This starts:
-
-* FastAPI backend on port `8000`
-* Vite development server on port `5173`
-
-Open the URL displayed by Vite (typically `http://localhost:5173`), select **Connect & Talk**, grant microphone access, and begin playing.
-
-## Optional Player Accounts
-
-Voice Heist can be played anonymously without creating an account.
-
-Players who choose to register can:
+Voice Heist can be played anonymously, with no account. Players who choose to register can:
 
 * Preserve scores across sessions
 * Appear on the leaderboard under a generated codename
-* Return later using either their email address or a generated access code
+* Return later with either their email address or a generated code
 
-Examples of generated codenames include:
-
-* Crimson Fox 42
-* Silver Raven 17
-* Midnight Wolf 08
-
-Only codenames are displayed publicly. Names and email addresses are used solely for account recovery and are never shown on the leaderboard.
+Examples of generated codenames: Crimson Fox 42, Silver Raven 17, Midnight Wolf 08. Only codenames are shown publicly; names and email addresses are used solely for account recovery and never appear on the leaderboard.
 
 ## Deployment
 
-A Dockerfile is included for production deployment.
+A Dockerfile is included for production deployment. The container builds the frontend and serves the complete application through the FastAPI backend on a single port.
 
-The container builds the frontend and serves the complete application through the FastAPI backend using a single port.
-
-### Required Environment Variables
+Required:
 
 ```bash
 DEEPGRAM_API_KEY=<your-key>
 ```
 
-### Optional Environment Variables
+Optional:
 
 ```bash
 ANTHROPIC_API_KEY=<your-key>
 VH_SIGNING_SECRET=<long-random-secret>
 ```
 
-If player sign-in is enabled, `VH_SIGNING_SECRET` should be configured to ensure authentication cookies remain valid across application restarts.
+If player sign-in is enabled, set `VH_SIGNING_SECRET` so authentication cookies stay valid across restarts. Never commit secrets or API keys.
 
-Never commit secrets or API keys to source control.
+## Project structure
 
-## Project Structure
+<details>
+<summary>Files and what they do</summary>
 
 ```text
 brain/
@@ -174,6 +130,7 @@ client/
     ├── identity.css
     └── main.js
 ```
+</details>
 
 ## Security
 
@@ -186,4 +143,14 @@ Voice Heist follows a server-side credential model:
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+MIT. See the [LICENSE](LICENSE) file.
+
+---
+
+<p align="center">
+  Built with the <a href="https://developers.deepgram.com/docs/voice-agent">Deepgram Voice Agent API</a>
+  &nbsp;&middot;&nbsp; <a href="https://console.deepgram.com/signup">Get a free key</a>
+  &nbsp;&middot;&nbsp; <a href="https://developers.deepgram.com/">Docs</a>
+  <br>
+  Built something with it? Give the repo a star.
+</p>

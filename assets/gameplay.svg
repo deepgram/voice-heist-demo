@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" role="img" aria-label="Voice Heist gameplay">
+<title>Voice Heist gameplay</title>
+<desc>A heist in progress: the player talks Vince the bouncer into letting them in by pointing to a checkable guest list, and the turn scores WARM.</desc>
+<defs>
+<radialGradient id="gTeal" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#0bd1c9" stop-opacity="0.16"/><stop offset="100%" stop-color="#0bd1c9" stop-opacity="0"/></radialGradient>
+<linearGradient id="gOrb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c026d3"/><stop offset="50%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient>
+</defs>
+<rect x="0" y="0" width="1200" height="600" rx="16" fill="#07111a"/>
+<ellipse cx="240" cy="120" rx="420" ry="320" fill="url(#gTeal)"/>
+<g font-family="'Trebuchet MS','Segoe UI',Arial,sans-serif">
+<circle cx="48" cy="40" r="7" fill="#22e3b5"/>
+<text x="66" y="47" font-size="20" font-weight="bold" letter-spacing="3" fill="#eafdff">VOICE HEIST</text>
+<text x="1156" y="33" text-anchor="end" font-size="12" letter-spacing="2" fill="#6b8aa0">SCORE</text>
+<text x="1156" y="57" text-anchor="end" font-size="22" font-weight="bold" fill="#22e3b5">500</text>
+<g fill="none" stroke="url(#gOrb)" stroke-linecap="round">
+<path d="M150 190 C 165 300, 315 300, 330 190" stroke-width="34" opacity="0.12"/>
+<path d="M150 190 C 165 300, 315 300, 330 190" stroke-width="18" opacity="0.28"/>
+<path d="M150 190 C 165 300, 315 300, 330 190" stroke-width="9"/>
+</g>
+<text x="240" y="362" text-anchor="middle" font-size="25" font-weight="bold" fill="#eafdff">Vince, the Bouncer</text>
+<rect x="194" y="380" width="92" height="26" rx="13" fill="none" stroke="#3a5161"/>
+<text x="240" y="398" text-anchor="middle" font-size="12" letter-spacing="2" fill="#8fb0c2">DEADPAN</text>
+<rect x="172" y="428" width="136" height="34" rx="17" fill="#10202b" stroke="#2b4a55"/>
+<text x="240" y="450" text-anchor="middle" font-size="14" fill="#a9c2d1">Turn 2 of 5</text>
+<rect x="470" y="92" width="690" height="456" rx="18" fill="#0c1722" stroke="#22323f"/>
+<text x="500" y="138" font-size="12" letter-spacing="1" fill="#6fe9d2">VINCE</text>
+<rect x="496" y="148" width="556" height="78" rx="14" fill="#16222d"/>
+<text x="520" y="180" font-size="16" fill="#c8dbe8">You on the list? Only names on the list get</text>
+<text x="520" y="204" font-size="16" fill="#c8dbe8">through tonight. So, what's yours?</text>
+<text x="1130" y="262" text-anchor="end" font-size="12" letter-spacing="1" fill="#7fd0ff">YOU</text>
+<rect x="556" y="272" width="576" height="102" rx="14" fill="#102a2b" stroke="#1f4a47"/>
+<text x="580" y="304" font-size="16" fill="#d7ece8">I'm not on the main list, but I'm on the band's</text>
+<text x="580" y="328" font-size="16" fill="#d7ece8">plus-one under Rivera. You can check, I'll</text>
+<text x="580" y="352" font-size="16" fill="#d7ece8">wait.</text>
+<rect x="496" y="398" width="156" height="34" rx="17" fill="#123a2a" stroke="#2faa6a"/>
+<text x="574" y="420" text-anchor="middle" font-size="14" font-weight="bold" fill="#6ff0b0">+400 · WARM</text>
+<text x="500" y="498" font-size="14" fill="#7d97a8">Getting warm, the bouncer is listening...</text>
+<text x="600" y="582" text-anchor="middle" font-size="13" fill="#6b8290">Talk each gatekeeper into bending its one rule, scored turn by turn.</text>
+</g>
+</svg>
