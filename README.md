@@ -64,7 +64,7 @@ You will need:
 
 Create a free account:
 
-[Deepgram Console Sign Up](https://console.deepgram.com/signup?utm_source=chatgpt.com)
+[Deepgram Console Sign Up](https://console.deepgram.com/signup)
 
 An Anthropic API key is optional and enables the conversation scoring judge.
 
