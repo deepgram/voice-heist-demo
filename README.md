@@ -47,13 +47,16 @@ allow the mic, and start talking. Keep your keys server-side: the brain holds
 
 The included `Dockerfile` builds the client and serves everything from the Python
 brain on a single port. Set `DEEPGRAM_API_KEY` (and optionally `ANTHROPIC_API_KEY`)
-as environment variables on your host. Never commit them.
+as environment variables on your host; if you keep the optional sign-up, also set
+`VH_SIGNING_SECRET` to a long random string so sign-in cookies survive restarts.
+Never commit them.
 
 ## Layout
 
 ```
 brain/
-  app.py        FastAPI: /api/deepgram-token, /ws/brain, /api/leaderboard, static
+  app.py        FastAPI: /api/deepgram-token, /api/auth/*, /ws/brain, /api/leaderboard, static
+  auth.py       optional identity: name+email sign-up -> code + codename, email/code sign-in
   agents.py     the four gatekeepers plus Host and Briefer: prompts, voices, Settings
   session.py    per-connection game brain: routing, handoff, verdict
   judge.py      fail-soft per-turn scorer (WARM or WEAK; the win is the gatekeeper's grant)
@@ -62,15 +65,20 @@ brain/
 client/
   index.html    the game
   src/game.js   the voice loop (Deepgram @deepgram/agents SDK)
-  src/ui.js, voice.js, sfx.js, leaderboard.js, main.js
+  src/ui.js, voice.js, sfx.js, leaderboard.js, auth.js, main.js
 ```
 
 ## What is different from the booth build
 
-Removed for the public demo: the device gate and player sign-in (`vh_gate` and
-`vh_player` cookies), OAuth/OIDC, phone registration, and the admin portal. Every
-browser that connects gets a fresh anonymous player, so anyone can play immediately
-and replay freely.
+Removed for the public demo: the device gate (`vh_gate`), the "sign in with any
+account" OAuth/OIDC flow, and the admin portal. Anyone can play immediately as a
+fresh anonymous player.
+
+What's kept is a lightweight, optional identity: sign up with a name + email to get
+a short code and a public codename ("Crimson Fox 42"), then sign in later with your
+email or that code to keep your standings. The name and email are stored only to
+recognize a returning player — the public leaderboard shows the codename, never your
+name or email.
 
 ## License
 

@@ -246,6 +246,18 @@ def get_player_by_pid(pid: str) -> dict | None:
     return _player_row_to_dict(row)
 
 
+def get_player_by_email(email: str) -> dict | None:
+    """Most recent player registered with this email, case-insensitive. Email is
+    not unique (a repeat sign-up just makes a new row), so this resolves to the
+    latest one — enough for 'sign in with your email'. None if no match."""
+    assert _conn is not None
+    row = _conn.execute(
+        "SELECT * FROM players WHERE LOWER(email) = LOWER(?) ORDER BY created_at DESC LIMIT 1",
+        (email.strip(),),
+    ).fetchone()
+    return _player_row_to_dict(row)
+
+
 def touch_last_seen(pid: str) -> None:
     assert _conn is not None
     with _lock:

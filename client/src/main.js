@@ -3,6 +3,7 @@ import "./styles.css"; // our layout, imported after so it can layer on top
 import { Game } from "./game.js";
 import * as ui from "./ui.js";
 import { createWakeListener } from "./voice.js";
+import { initIdentity } from "./auth.js";
 
 const game = new Game();
 
@@ -54,5 +55,10 @@ ui.onFinish(() => finishForNextPlayer());
 ui.onNewPlayer(() => finishForNextPlayer());
 ui.initHowTo();
 
-// Start straight into the game — no sign-in.
+// Start straight into the game — anonymous play needs no sign-in.
 startSession();
+
+// Optional identity (lobby): sign up (name + email) for a codename + persistent
+// standings, or sign in with an email/code. Any change re-opens the session so the
+// brain re-reads the cookie. See client/src/auth.js + brain/auth.py.
+initIdentity({ onChange: finishForNextPlayer });

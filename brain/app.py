@@ -2,6 +2,7 @@
 
 - GET  /api/deepgram-token : mints a short-lived Deepgram token from DEEPGRAM_API_KEY.
 - GET  /api/leaderboard    : public daily leaderboard (codenames + scores; no PII).
+- *    /api/auth/*         : optional player identity (name+email sign-up / code sign-in).
 - WS   /ws/brain           : the game brain. The browser relays function calls and
                              turn events; we reply with directives (handoff, result,
                              lobby, function responses). No audio passes through here.
@@ -10,9 +11,11 @@
 The browser keeps the low-latency audio WebSocket straight to Deepgram (via the
 @deepgram/agents SDK); this server only carries small JSON control messages.
 
-This is the PUBLIC DEMO build: the booth authentication layer (device gate, player
-sign-in, OAuth, admin portal) has been removed. Every browser that connects gets a
-fresh anonymous player, so anyone can play immediately and replay freely.
+This is the PUBLIC DEMO build: the booth's device gate, Auth0 OAuth, and admin
+portal are gone. What remains is an OPTIONAL, self-service identity (see auth.py):
+play immediately as a fresh anonymous player, or sign up with a name + email to get
+a short code that keeps your standings across visits. The public leaderboard only
+ever shows a derived codename, never the name or email.
 """
 
 from __future__ import annotations
@@ -30,6 +33,7 @@ ROOT = Path(__file__).resolve().parent.parent  # voice-heist-demo/
 # Load .env before importing local modules so config is populated first.
 load_dotenv(ROOT / ".env", override=True)
 
+import auth  # noqa: E402
 import store  # noqa: E402
 from session import GameSession  # noqa: E402
 
@@ -43,6 +47,9 @@ def available_scenarios() -> list[str]:
 
 
 app = FastAPI(title="Voice Heist (demo)")
+# Optional, PII-free player identity (get-a-code / sign-in). No gate, no OAuth,
+# no personal data — see brain/auth.py.
+app.include_router(auth.router)
 
 
 @app.on_event("startup")
@@ -80,10 +87,11 @@ def api_leaderboard() -> dict:
 
 @app.websocket("/ws/brain")
 async def brain(ws: WebSocket) -> None:
-    # No auth in the demo: every connection is a fresh anonymous player, so anyone
-    # can play right away and replay freely.
+    # Optional identity: if the player signed in (vh_player cookie), run as that
+    # persistent player so their codename and standings carry over. With no cookie,
+    # make a fresh anonymous player so anyone can play right away.
     await ws.accept()
-    player = store.create_quick_player("Player")
+    player = auth.player_from_cookies(ws.cookies) or store.create_quick_player("Player")
     game = GameSession()
     day = store.event_day()
     game.configure(

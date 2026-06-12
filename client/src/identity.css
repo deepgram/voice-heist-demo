@@ -1,0 +1,115 @@
+/* Optional player identity (lobby sign-up / sign-in). Loaded by auth.js.
+   Dark-theme friendly; uses plain rgba so it works without design-system tokens. */
+.identity-bar {
+  margin-top: 14px;
+  font-size: 0.85rem;
+}
+.identity-acc {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 9px 13px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.identity-acc > summary {
+  cursor: pointer;
+  list-style: none;
+  opacity: 0.85;
+  user-select: none;
+}
+.identity-acc > summary::-webkit-details-marker {
+  display: none;
+}
+.identity-acc > summary::before {
+  content: "＋ ";
+  opacity: 0.6;
+}
+.identity-acc[open] > summary {
+  margin-bottom: 10px;
+  opacity: 1;
+  font-weight: 600;
+}
+.identity-acc[open] > summary::before {
+  content: "－ ";
+}
+.identity-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 4px 0;
+}
+.identity-input {
+  flex: 1 1 7rem;
+  min-width: 5.5rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.22);
+  color: inherit;
+  font: inherit;
+}
+.identity-input--wide {
+  flex: 2 1 11rem;
+}
+.identity-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+.identity-btn.dg-btn {
+  flex: 0 0 auto;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+}
+.identity-signin {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.identity-signin > span {
+  opacity: 0.7;
+}
+.identity-note {
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  line-height: 1.4;
+}
+.identity-msg {
+  margin: 6px 0 0;
+  min-height: 1em;
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
+.identity-msg.is-error {
+  color: #ff9aa2;
+  opacity: 1;
+}
+.identity-in {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.identity-who b {
+  color: #fff;
+}
+.identity-code {
+  opacity: 0.8;
+}
+.identity-code b {
+  letter-spacing: 0.1em;
+}
+.identity-link {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  opacity: 0.75;
+}
+.identity-link:hover {
+  opacity: 1;
+}
