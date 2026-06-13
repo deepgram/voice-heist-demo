@@ -106,6 +106,10 @@ Examples of generated codenames: Crimson Fox 42, Silver Raven 17, Midnight Wolf 
 
 The public leaderboard shows the day's top scores, each listed by a generated **codename** only (like Crimson Fox 42) — never a name or email. Results are public; the people behind them stay private.
 
+<p align="center">
+  <img src="assets/leaderboard.svg" alt="Voice Heist high-scores board: four daily cards listing players by generated codename and score only — Thursday (latest), Wednesday, Monday's top eight, and Saturday — with no names or emails shown" width="100%">
+</p>
+
 ## Deployment
 
 A Dockerfile is included for production deployment. The container builds the frontend and serves the complete application through the FastAPI backend on a single port.
