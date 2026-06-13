@@ -127,7 +127,7 @@ Without `ANTHROPIC_API_KEY` the game still runs; every turn just scores the mini
 <summary>Files and what they do</summary>
 
 ```text
-docs/                # ARCHITECTURE, HOW_TO_PLAY, SECURITY
+docs/                # ARCHITECTURE, HOW_TO_PLAY
 brain/
 ├── app.py           # FastAPI app: token minting, leaderboard, the /ws/brain control socket
 ├── auth.py          # Optional, PII-free player registration and sign-in
@@ -153,16 +153,6 @@ client/
 
 See **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** for how these fit together.
 </details>
-
-## Security
-
-Voice Heist keeps every long-lived secret on the server:
-
-* Deepgram API keys stay on the backend; the browser gets only short-lived (300s) tokens
-* Sign-in cookies are signed and validated server-side
-* No audio, and no long-lived credentials, ever reach the client
-
-Found a vulnerability? See **[SECURITY.md](docs/SECURITY.md)** and please don't open a public issue.
 
 ## License
 
