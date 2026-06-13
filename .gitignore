@@ -16,9 +16,6 @@ __pycache__/
 # Fly
 .fly/
 
-# Documentation built by claude during planning
-docs/
-
 # Local SQLite DB (prod uses the Fly volume)
 *.db
 *.db-wal

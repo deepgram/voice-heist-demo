@@ -10,7 +10,7 @@ For anything non-trivial, please open an issue first so we can align before you 
 
 ## Local setup
 
-The full quickstart is in the [README](README.md#quickstart). In short:
+The full quickstart is in the [README](../README.md#quickstart). In short:
 
 ```bash
 cp .env.example .env            # add your Deepgram key
@@ -26,13 +26,13 @@ You'll need a free [Deepgram API key](https://console.deepgram.com/signup) (Memb
 
 [ARCHITECTURE.md](ARCHITECTURE.md) is the deep dive. The short version:
 
-- `brain/` — the Python game brain (FastAPI). [`agents.py`](brain/agents.py) is the source of truth for prompts, voices, and functions; [`session.py`](brain/session.py) holds the game logic.
+- `brain/` — the Python game brain (FastAPI). [`agents.py`](../brain/agents.py) is the source of truth for prompts, voices, and functions; [`session.py`](../brain/session.py) holds the game logic.
 - `client/` — the Vite frontend that holds the Deepgram audio session.
 
 ## Coding guidelines
 
 - **Match the surrounding code.** Follow the existing naming, structure, and comment style in the file you're editing.
-- **Keep spoken lines TTS-safe.** Anything an agent says aloud must avoid em/en dashes, markdown, emojis, and stage directions — they get read literally or make the TTS stumble. See `VOICE_STYLE` and `speak_safe()` in [`brain/agents.py`](brain/agents.py), and Deepgram's [voice-prompting guide](https://developers.deepgram.com/docs/prompting-voice-agents).
+- **Keep spoken lines TTS-safe.** Anything an agent says aloud must avoid em/en dashes, markdown, emojis, and stage directions — they get read literally or make the TTS stumble. See `VOICE_STYLE` and `speak_safe()` in [`brain/agents.py`](../brain/agents.py), and Deepgram's [voice-prompting guide](https://developers.deepgram.com/docs/prompting-voice-agents).
 - **Keep game logic in the brain.** The client renders UI and operates the socket; rules live in `session.py`.
 - **Never commit secrets.** `.env`, API keys, and local `*.db` files are git-ignored — keep it that way.
 
@@ -54,4 +54,4 @@ There's no automated game test, so exercise it by hand:
 
 For "how do I build X with Deepgram" questions, the [Deepgram Discord](https://discord.gg/deepgram) is the fastest place to get help.
 
-By contributing, you agree that your contributions are licensed under the [MIT License](LICENSE).
+By contributing, you agree that your contributions are licensed under the [MIT License](../LICENSE).

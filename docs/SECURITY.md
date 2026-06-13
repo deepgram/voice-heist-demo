@@ -15,9 +15,9 @@ We'll acknowledge your report within a few business days and keep you updated as
 
 Voice Heist is built around keeping secrets on the server:
 
-- Your `DEEPGRAM_API_KEY` stays on the backend. The browser receives only a **short-lived (300s) access token**, minted per session via Deepgram's `/v1/auth/grant` — see [`brain/app.py`](brain/app.py).
+- Your `DEEPGRAM_API_KEY` stays on the backend. The browser receives only a **short-lived (300s) access token**, minted per session via Deepgram's `/v1/auth/grant` — see [`brain/app.py`](../brain/app.py).
 - **No audio passes through this server.** The audio stream is direct between the browser and Deepgram.
-- Optional sign-in cookies are **signed and validated server-side** with `VH_SIGNING_SECRET` — see [`brain/auth.py`](brain/auth.py).
+- Optional sign-in cookies are **signed and validated server-side** with `VH_SIGNING_SECRET` — see [`brain/auth.py`](../brain/auth.py).
 - The public leaderboard shows only a derived **codename**, never a name or email.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the full picture.
@@ -26,7 +26,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the full picture.
 
 These are documented trade-offs for a runnable demo, not bugs:
 
-- **Running without `VH_SIGNING_SECRET`** falls back to an ephemeral, per-process dev secret. That's fine for local play, but it **must** be set in production so sign-in cookies survive restarts and can't be forged — see [`.env.example`](.env.example).
+- **Running without `VH_SIGNING_SECRET`** falls back to an ephemeral, per-process dev secret. That's fine for local play, but it **must** be set in production so sign-in cookies survive restarts and can't be forged — see [`.env.example`](../.env.example).
 - **Running without `ANTHROPIC_API_KEY`** disables graded scoring (every turn scores the minimum). The game still runs.
 - Local `.env` files and the SQLite database (`*.db`) are git-ignored. Never commit secrets or API keys.
 
