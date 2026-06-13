@@ -100,7 +100,11 @@ Voice Heist can be played anonymously, with no account. Players who choose to re
 * Appear on the leaderboard under a generated codename
 * Return later with either their email address or a generated code
 
-Examples of generated codenames: Crimson Fox 42, Silver Raven 17, Midnight Wolf 08. Only codenames are shown publicly; names and email addresses are used solely for account recovery and never appear on the leaderboard.
+Examples of generated codenames: Crimson Fox 42, Silver Raven 17, Midnight Wolf 08. Any name or email you provide is used solely for account recovery.
+
+## Leaderboard
+
+The public leaderboard shows the day's top scores, each listed by a generated **codename** only (like Crimson Fox 42) — never a name or email. Results are public; the people behind them stay private.
 
 ## Deployment
 
