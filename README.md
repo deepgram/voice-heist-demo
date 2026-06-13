@@ -23,7 +23,7 @@ Voice Heist is a complete, low-latency voice-agent app built on the [Deepgram Vo
 A real, end-to-end pattern for shipping a voice agent on the Deepgram Voice Agent API:
 
 * **Low-latency browser audio** with the `@deepgram/agents` SDK, where the audio loop is Deepgram-managed and never touches your server
-* **Multi-agent orchestration and handoffs** between a Host, a Briefer, and four gatekeepers ([two handoff strategies, and why](docs/ARCHITECTURE.md#three-agents-two-handoff-strategies))
+* **Multi-agent orchestration and handoffs** between a Host, a Briefer, and four gatekeepers ([three roles, two handoff strategies, and why](docs/ARCHITECTURE.md#three-roles-two-handoff-strategies))
 * **Function calling that drives real outcomes** (`grant_request` / `deny_request`)
 * **A resilient think layer**: an ordered LLM fallback chain across two vendors, so an outage degrades the game instead of killing it
 * **Turn-by-turn scoring that fails soft**: a separate judge call that defaults to a safe minimum, never blocking play
@@ -127,7 +127,7 @@ Without `ANTHROPIC_API_KEY` the game still runs; every turn just scores the mini
 <summary>Files and what they do</summary>
 
 ```text
-docs/                # ARCHITECTURE, HOW_TO_PLAY, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT
+docs/                # ARCHITECTURE, HOW_TO_PLAY, SECURITY
 brain/
 ├── app.py           # FastAPI app: token minting, leaderboard, the /ws/brain control socket
 ├── auth.py          # Optional, PII-free player registration and sign-in
@@ -163,10 +163,6 @@ Voice Heist keeps every long-lived secret on the server:
 * No audio, and no long-lived credentials, ever reach the client
 
 Found a vulnerability? See **[SECURITY.md](docs/SECURITY.md)** and please don't open a public issue.
-
-## Contributing
-
-Issues and PRs are welcome, see **[CONTRIBUTING.md](docs/CONTRIBUTING.md)** for setup, scope, and guidelines. We follow the [Contributor Covenant](docs/CODE_OF_CONDUCT.md). For "how do I build X with Deepgram" questions, the [Deepgram Discord](https://discord.gg/deepgram) is the fastest place to get help.
 
 ## License
 

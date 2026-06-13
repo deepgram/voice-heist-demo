@@ -65,9 +65,9 @@ The browser needs *something* to authenticate its Deepgram socket, but it must n
 
 This is the single most important pattern to copy into any browser-based voice app: **mint, don't embed.**
 
-## Three agents, two handoff strategies
+## Three roles, two handoff strategies
 
-The player meets three "characters," but they're all **one Deepgram session, reconfigured** — a swap of prompt + voice + the active function set:
+Each heist puts the player through three **roles** — the Host, the Briefer, and one of the four gatekeepers — all served by **one Deepgram session, reconfigured**: a swap of prompt + voice + the active function set:
 
 ```mermaid
 flowchart LR
