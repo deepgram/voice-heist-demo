@@ -180,7 +180,7 @@ LEVELS = {
         "level": 2,
         "title": "The Receptionist",
         "agentName": "Globex Receptionist",
-        "voice": "aura-2-thalia-en",
+        "voice": "aura-2-electra-en",
         "goal": "Reach a human.",
         "ruleHint": "It won't transfer you unless you give exact routing details only a human team could handle.",
         "hint": "Skip the buzzwords. Give an exact case or reference number and the specific team it belongs to (\"following up on case 7741 with billing escalations\"), so the bot literally can't pull it up.",
