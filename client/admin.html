@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voice Heist — Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&family=Orbitron:wght@600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg:#07090f; --card:#11161f; --card2:#1a2130; --line:#2b3346;
+        --ink:#eaf2ff; --muted:#8b97ad; --green:#13ef93; --pink:#ee028c;
+        --blue:#14a9fb; --gold:#ffd45e;
+      }
+      * { box-sizing:border-box; }
+      html, body { margin:0; min-height:100vh; }
+      body {
+        color:var(--ink); font:16px/1.5 Inter, system-ui, sans-serif;
+        padding:clamp(20px,3.5vw,52px); overflow-x:hidden;
+        background:
+          radial-gradient(1200px 760px at 82% -12%, color-mix(in srgb, var(--blue) 14%, transparent) 0%, transparent 60%),
+          radial-gradient(1200px 760px at 8% 0%, color-mix(in srgb, var(--green) 14%, transparent) 0%, transparent 55%),
+          var(--bg);
+      }
+      body::before { content:""; position:fixed; inset:0; z-index:50; pointer-events:none;
+        background:radial-gradient(125% 125% at 50% 50%, transparent 55%, rgba(0,0,0,.6) 100%); }
+
+      .head { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:8px; flex-wrap:wrap; }
+      .brand { font-family:Orbitron, sans-serif; font-weight:800; letter-spacing:5px; color:var(--green);
+        font-size:clamp(15px,2vw,22px); text-shadow:0 0 10px color-mix(in srgb, var(--green) 60%, transparent); }
+      .title { font-family:Orbitron, sans-serif; font-weight:900; letter-spacing:6px; margin:0;
+        font-size:clamp(26px,5vw,56px);
+        background:linear-gradient(180deg, #fff, var(--green)); -webkit-background-clip:text; background-clip:text; color:transparent;
+        filter:drop-shadow(0 0 26px color-mix(in srgb, var(--green) 45%, transparent)); }
+      .status { font-family:Orbitron, sans-serif; color:var(--muted); font-size:13px; letter-spacing:1px; min-height:18px; }
+      .status.ok { color:var(--green); }
+      .status.err { color:var(--pink); }
+
+      .note { max-width:760px; margin:0 auto 22px; color:var(--muted); font-size:13.5px; text-align:center;
+        border:1px dashed var(--line); border-radius:12px; padding:10px 16px; }
+      .note b { color:var(--gold); }
+
+      .panel { max-width:760px; margin:0 auto; display:grid; gap:14px; }
+      .game { display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:clamp(16px,3vw,34px);
+        background:linear-gradient(180deg, var(--card), color-mix(in srgb, var(--card) 80%, #000));
+        border:1px solid var(--line); border-radius:16px; padding:18px clamp(18px,2.4vw,26px);
+        box-shadow:0 14px 40px rgba(0,0,0,.4); transition:opacity .2s, border-color .2s; }
+      .game.off { opacity:.5; }
+      .game-title { font-family:Orbitron, sans-serif; font-weight:700; letter-spacing:1px; font-size:clamp(16px,1.7vw,20px); }
+      .game-id { color:var(--muted); font-size:12px; letter-spacing:1px; font-family:"Fira Code", ui-monospace, monospace; margin-top:3px; }
+      .ctl { display:flex; flex-direction:column; align-items:center; gap:7px; }
+      .ctl-label { font-family:Orbitron, sans-serif; font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; }
+      input[type=number] { width:74px; background:var(--bg); color:var(--ink); border:1px solid var(--line);
+        border-radius:10px; padding:9px 10px; font:800 18px Orbitron, sans-serif; text-align:center; }
+      input[type=number]:focus { outline:none; border-color:color-mix(in srgb, var(--green) 60%, var(--line)); }
+
+      .switch { position:relative; display:inline-block; width:54px; height:30px; }
+      .switch input { opacity:0; width:0; height:0; }
+      .slider { position:absolute; inset:0; background:var(--card2); border:1px solid var(--line);
+        border-radius:999px; transition:.2s; cursor:pointer; }
+      .slider::before { content:""; position:absolute; height:22px; width:22px; left:3px; top:3px;
+        background:var(--muted); border-radius:50%; transition:.2s; }
+      .switch input:checked + .slider { background:color-mix(in srgb, var(--green) 28%, var(--card2));
+        border-color:color-mix(in srgb, var(--green) 60%, var(--line)); }
+      .switch input:checked + .slider::before { transform:translateX(24px); background:var(--green);
+        box-shadow:0 0 10px color-mix(in srgb, var(--green) 65%, transparent); }
+
+      .actions { max-width:760px; margin:26px auto 0; display:flex; align-items:center; justify-content:flex-end; gap:18px; }
+      button.save { font-family:Orbitron, sans-serif; font-weight:800; letter-spacing:2px; font-size:15px;
+        color:#07110b; background:var(--green); border:none; border-radius:12px; padding:13px 28px; cursor:pointer;
+        box-shadow:0 0 22px color-mix(in srgb, var(--green) 35%, transparent); transition:transform .1s, opacity .2s; }
+      button.save:hover { transform:translateY(-1px); }
+      button.save:disabled { opacity:.5; cursor:default; transform:none; }
+
+      .loading { color:var(--muted); text-align:center; padding:80px 0; font-size:18px;
+        font-family:Orbitron, sans-serif; letter-spacing:2px; }
+      a.back { color:var(--muted); text-decoration:none; font-size:13px; letter-spacing:1px; }
+      a.back:hover { color:var(--green); }
+    </style>
+  </head>
+  <body>
+    <div class="head">
+      <div class="brand">&#9673; VOICE HEIST</div>
+      <h1 class="title">ADMIN</h1>
+      <div class="status" id="status">LOADING…</div>
+    </div>
+    <p class="note">
+      Changes apply to the <b>next session</b> (and each heist's next start) — no restart needed.
+      This board has <b>no sign-in</b>: anyone who can reach it can edit it.
+    </p>
+    <div class="panel" id="panel"><p class="loading">LOADING…</p></div>
+    <div class="actions">
+      <a class="back" href="/">&#8592; back to game</a>
+      <button class="save" id="save" disabled>SAVE</button>
+    </div>
+    <script type="module" src="/src/admin.js"></script>
+  </body>
+</html>

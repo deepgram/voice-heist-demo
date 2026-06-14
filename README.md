@@ -110,6 +110,14 @@ The public leaderboard shows the day's top scores, each listed by a generated **
   <img src="assets/leaderboard.svg" alt="Voice Heist high-scores board: four daily cards listing players by generated codename and score only — Thursday (latest), Wednesday, Monday's top eight, and Saturday — with no names or emails shown" width="100%">
 </p>
 
+## Admin
+
+A bare-bones control board at **`/admin.html`** sets which heists are live and each heist's turn cap (1–20). Edits are saved to SQLite and read live, so they take effect on the next session and the next heist start — no restart. The demo strips the booth's sign-in, so the board is **unprotected**: anyone who can reach it can change it. Keep it off the public internet, or add a gate (the backend already ships a `verify_site_password` helper).
+
+<p align="center">
+  <img src="assets/admin.svg" alt="Voice Heist admin board: four heist rows, each with a turn-cap input and a Live toggle — The Order (8 turns), The Refund (5), and The Receptionist (7) live, and The List disabled" width="100%">
+</p>
+
 ## Deployment
 
 A Dockerfile is included for production deployment. The container builds the frontend and serves the complete application through the FastAPI backend on a single port.

@@ -35,6 +35,7 @@ load_dotenv(ROOT / ".env", override=True)
 
 import auth  # noqa: E402
 import store  # noqa: E402
+from agents import LEVELS, MAX_TURNS  # noqa: E402
 from session import GameSession  # noqa: E402
 
 DEEPGRAM_API_KEY = os.environ.get("DEEPGRAM_API_KEY")
@@ -83,6 +84,42 @@ async def deepgram_token() -> PlainTextResponse:
 def api_leaderboard() -> dict:
     """Public, read-only daily leaderboard (codenames + scores; no PII, no auth)."""
     return {"days": store.leaderboard()}
+
+
+# ---- admin board (no auth) -------------------------------------------------
+# The booth build gated this behind a sign-in; the demo intentionally does not.
+# Flip which heists are live and set each heist's turn cap. Both are read live
+# (available_scenarios() per connection, session._cap_for() per heist), so edits
+# take effect on the next session/heist with no restart. Served at /admin.html.
+TURNS_MIN, TURNS_MAX = 1, 20  # mirrors store._clamp_turns
+
+
+def _admin_config() -> dict:
+    available = set(store.get_available())
+    turns = store.get_turns()
+    games = [
+        {"id": g, "title": LEVELS[g]["title"],
+         "available": g in available, "turns": turns.get(g, MAX_TURNS)}
+        for g in store.ALL_SCENARIOS
+    ]
+    return {"games": games, "turnsMin": TURNS_MIN, "turnsMax": TURNS_MAX}
+
+
+@app.get("/api/admin/config")
+def admin_get_config() -> dict:
+    """Current per-heist availability + turn caps for the admin board."""
+    return _admin_config()
+
+
+@app.post("/api/admin/config")
+async def admin_set_config(payload: dict) -> dict:
+    """Update which heists are live and each heist's turn cap (no auth in the demo).
+    store clamps turn values and drops unknown ids, so bad input can't corrupt config."""
+    games = payload.get("games") or []
+    valid = [g for g in games if isinstance(g, dict) and g.get("id") in store.ALL_SCENARIOS]
+    store.set_available([g["id"] for g in valid if g.get("available")])
+    store.set_turns({g["id"]: g["turns"] for g in valid if "turns" in g})
+    return _admin_config()
 
 
 @app.websocket("/ws/brain")

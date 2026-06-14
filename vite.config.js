@@ -18,10 +18,11 @@ export default defineConfig({
     outDir: "../dist",
     emptyOutDir: true,
     rollupOptions: {
-      // The game + the public leaderboard page.
+      // The game + the public leaderboard page + the admin board.
       input: {
         main: "client/index.html",
         leaderboard: "client/leaderboard.html",
+        admin: "client/admin.html",
       },
     },
   },
