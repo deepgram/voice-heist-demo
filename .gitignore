@@ -1,0 +1,23 @@
+node_modules/
+dist/
+.vite/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Fly
+.fly/
+
+# Local SQLite DB (prod uses the Fly volume)
+*.db
+*.db-wal
+*.db-shm
+.claude/settings.local.json

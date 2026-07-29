@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voice Heist — Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@600&family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root { --bg:#0b0e14; --card:#161b27; --card2:#1f2533; --line:#2b3346; --ink:#e7ecf3; --muted:#8b97ad; --primary:#13ef93; --danger:#ff5c7a; }
+      * { box-sizing: border-box; }
+      body { margin:0; min-height:100vh; background:radial-gradient(900px 600px at 50% -10%, #16203a 0%, var(--bg) 55%);
+        color:var(--ink); font:15px/1.5 Inter, -apple-system, BlinkMacSystemFont, sans-serif; padding:32px 20px; }
+      .wrap { max-width:560px; margin:0 auto; }
+      .brand { font-family:"Fira Code",monospace; font-weight:600; letter-spacing:2px; color:var(--primary); font-size:13px; }
+      h1 { font-size:22px; margin:6px 0 2px; }
+      .sub { color:var(--muted); margin:0 0 22px; font-size:14px; }
+      .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin-bottom:16px; }
+      .card h2 { font-size:15px; margin:0 0 4px; }
+      .card p.hint { color:var(--muted); font-size:13px; margin:0 0 14px; }
+      .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:10px;
+        border:1px solid var(--line); background:var(--card2); color:var(--ink); font-size:14px; font-weight:600; cursor:pointer; }
+      .btn:hover:not(:disabled) { border-color:var(--primary); }
+      .btn:disabled { opacity:.5; cursor:not-allowed; }
+      .btn--primary { background:var(--primary); color:#06281b; border-color:transparent; }
+      .btn--danger { background:transparent; color:var(--danger); border-color:color-mix(in srgb, var(--danger) 50%, transparent); }
+      .btn--danger:hover:not(:disabled) { border-color:var(--danger); }
+      .row { display:flex; gap:10px; align-items:center; }
+      .check { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; margin-bottom:8px; cursor:pointer; }
+      .check input { width:18px; height:18px; accent-color:var(--primary); }
+      .check .name { font-weight:600; }
+      .check .id { color:var(--muted); font-family:"Fira Code",monospace; font-size:12px; margin-left:auto; }
+      input[type=text], input[type=password] { flex:1; min-width:0; padding:10px 12px; border-radius:10px; border:1px solid var(--line);
+        background:#0d1118; color:var(--ink); font-size:14px; }
+      input:focus { outline:none; border-color:var(--primary); }
+      .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+      .who { color:var(--muted); font-size:13px; }
+      .who b { color:var(--ink); }
+      .toast { position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:var(--card2); border:1px solid var(--line);
+        border-radius:10px; padding:10px 16px; font-size:14px; opacity:0; transition:opacity .2s; pointer-events:none; }
+      .toast.show { opacity:1; }
+      .toast.err { border-color:var(--danger); color:var(--danger); }
+      .denied { background:color-mix(in srgb, var(--danger) 12%, transparent); border:1px solid color-mix(in srgb, var(--danger) 40%, transparent);
+        color:var(--danger); border-radius:10px; padding:10px 14px; font-size:13px; margin-bottom:16px; }
+      .muted { color:var(--muted); font-size:13px; }
+      /* collapsible sections */
+      .panel { background:var(--card); border:1px solid var(--line); border-radius:16px; margin-bottom:14px; overflow:hidden; }
+      .panel > summary { list-style:none; cursor:pointer; padding:16px 20px; font-size:15px; font-weight:700;
+        display:flex; align-items:center; gap:10px; user-select:none; }
+      .panel > summary::-webkit-details-marker { display:none; }
+      .panel > summary::before { content:"▸"; color:var(--muted); font-size:12px; transition:transform .15s ease; }
+      .panel[open] > summary::before { transform:rotate(90deg); }
+      .panel > summary:hover { color:var(--primary); }
+      .panel .body { padding:0 20px 18px; }
+      .panel .body .hint { margin-top:0; }
+      /* data browser */
+      .table-list { display:flex; flex-wrap:wrap; gap:8px; }
+      .table-chip { padding:8px 12px; border:1px solid var(--line); border-radius:10px; background:var(--card2);
+        color:var(--ink); cursor:pointer; font-size:13px; display:inline-flex; gap:8px; align-items:center; }
+      .table-chip:hover { border-color:var(--primary); }
+      .table-chip.active { border-color:var(--primary); color:var(--primary); }
+      .table-chip .ct { color:var(--muted); font-family:"Fira Code",monospace; font-size:11px; }
+      .table-meta { display:flex; justify-content:space-between; align-items:center; gap:10px; margin:16px 0 8px; font-size:13px; }
+      .pager .btn { padding:6px 10px; }
+      .table-scroll { overflow:auto; max-height:440px; border:1px solid var(--line); border-radius:10px; }
+      #dataTable { border-collapse:collapse; width:100%; font-size:12.5px; }
+      #dataTable th, #dataTable td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--line);
+        white-space:nowrap; max-width:340px; overflow:hidden; text-overflow:ellipsis; }
+      #dataTable th { position:sticky; top:0; background:#0d1118; font-family:"Fira Code",monospace; font-size:11px;
+        color:var(--muted); letter-spacing:.3px; }
+      #dataTable tbody tr:hover td { background:rgba(255,255,255,.03); }
+      [hidden] { display:none !important; }
+      code { font-family:"Fira Code",monospace; background:#0d1118; border:1px solid var(--line); border-radius:5px; padding:1px 5px; font-size:12px; }
+      /* daily winners */
+      .winner-row { display:grid; grid-template-columns:auto 1fr auto auto; gap:14px; align-items:center;
+        padding:9px 0; border-bottom:1px solid var(--line); font-size:13px; }
+      .winner-row:last-child { border-bottom:none; }
+      .winner-day { font-family:"Fira Code",monospace; color:var(--muted); white-space:nowrap; }
+      .winner-name { font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      .winner-email { color:var(--muted); white-space:nowrap; }
+      .winner-score { font-family:"Fira Code",monospace; color:var(--primary); font-weight:700; white-space:nowrap; }
+      /* players & scores */
+      .score-day { margin:0 0 18px; }
+      .score-day:last-child { margin-bottom:0; }
+      .score-day-head { display:flex; align-items:center; gap:10px; margin:0 0 6px; }
+      .score-day-head .day { font-family:"Fira Code",monospace; color:var(--ink); font-weight:700; font-size:13px; }
+      .score-day-head .meta { color:var(--muted); font-size:12px; }
+      .score-day-head .btn { margin-left:auto; padding:5px 10px; font-size:12px; }
+      .score-row { display:grid; grid-template-columns:22px 1fr auto auto; gap:4px 12px; align-items:center;
+        padding:9px 0; border-bottom:1px solid var(--line); font-size:13px; }
+      .score-row:last-child { border-bottom:none; }
+      .score-rank { font-family:"Fira Code",monospace; color:var(--muted); }
+      .score-who { min-width:0; }
+      .score-who .nm { font-weight:600; }
+      .score-who .em { display:block; color:var(--muted); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      .score-who .tier { font-family:"Fira Code",monospace; font-size:10px; text-transform:uppercase; letter-spacing:.5px;
+        color:var(--muted); border:1px solid var(--line); border-radius:5px; padding:0 5px; margin-left:6px; }
+      .score-total { font-family:"Fira Code",monospace; color:var(--primary); font-weight:700; white-space:nowrap; }
+      .score-del { background:transparent; border:1px solid color-mix(in srgb, var(--danger) 40%, transparent);
+        color:var(--danger); border-radius:8px; padding:4px 9px; font-size:12px; line-height:1; cursor:pointer; }
+      .score-del:hover { border-color:var(--danger); }
+      .score-plays { grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:5px; margin:2px 0 0 34px; }
+      .score-chip { font-size:11px; font-family:"Fira Code",monospace; color:var(--muted);
+        border:1px solid var(--line); border-radius:6px; padding:1px 6px; }
+      .score-chip.win { color:var(--primary); border-color:color-mix(in srgb, var(--primary) 40%, transparent); }
+      .score-chip.lose { color:var(--danger); border-color:color-mix(in srgb, var(--danger) 35%, transparent); }
+      .win-mail { display:inline-block; font:600 11px/1.4 inherit; color:var(--primary); background:transparent; cursor:pointer;
+        text-decoration:none; margin-left:8px; border:1px solid color-mix(in srgb, var(--primary) 35%, transparent);
+        border-radius:6px; padding:2px 8px; white-space:nowrap; }
+      .win-mail:hover { border-color:var(--primary); background:color-mix(in srgb, var(--primary) 12%, transparent); }
+      /* winner-email popup */
+      .modal { position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center;
+        padding:20px; background:rgba(3,6,12,.66); }
+      .modal-card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px;
+        width:100%; max-width:520px; box-shadow:0 18px 50px rgba(0,0,0,.5); }
+      .modal-head { display:flex; align-items:center; justify-content:space-between; font-weight:700; margin-bottom:12px; }
+      .modal-x { background:transparent; border:none; color:var(--muted); font-size:16px; cursor:pointer; line-height:1; }
+      .modal-x:hover { color:var(--ink); }
+      .modal-to { margin:0 0 14px; }
+      .modal-to b { color:var(--ink); }
+      .modal-label { display:block; font-size:12px; color:var(--muted); margin:0 0 5px; }
+      .modal-field { display:flex; gap:8px; align-items:flex-start; margin-bottom:14px; }
+      .modal-field:last-child { margin-bottom:0; }
+      #winModal input, #winModal textarea { flex:1; min-width:0; padding:10px 12px; border-radius:10px; border:1px solid var(--line);
+        background:#0d1118; color:var(--ink); font:13px/1.5 inherit; resize:vertical; }
+      #winModal input:focus, #winModal textarea:focus { outline:none; border-color:var(--primary); }
+      .modal-field .btn { padding:9px 12px; font-size:13px; white-space:nowrap; }
+      /* turns per game */
+      .turns-row { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; margin-bottom:8px; }
+      .turns-row .name { font-weight:600; }
+      .turns-row .id { color:var(--muted); font-family:"Fira Code",monospace; font-size:12px; }
+      .turns-row input { width:72px; margin-left:auto; padding:8px 10px; border-radius:8px; border:1px solid var(--line);
+        background:#0d1118; color:var(--ink); font-size:14px; text-align:center; }
+      .turns-row input:focus { outline:none; border-color:var(--primary); }
+      .powered-by { text-align:center; margin-top:26px; font-family:"Fira Code", ui-monospace, monospace;
+        font-size:11px; letter-spacing:1px; color:var(--muted); }
+      .powered-by span { color:var(--primary); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="brand">&#9673; VOICE HEIST · ADMIN</div>
+
+      <!-- Signed out -->
+      <section id="signin" hidden>
+        <h1>Admin sign-in</h1>
+        <p class="sub">Deepgram team only.</p>
+        <div id="denied" class="denied" hidden>That account isn't a verified <b>@deepgram.com</b> address. Try again with your Deepgram account.</div>
+        <div class="card">
+          <a id="signinBtn" class="btn btn--primary" href="/api/admin/login">Sign in with Deepgram</a>
+          <p id="noauth" class="muted" style="margin-top:12px" hidden>OAuth isn't configured on this server (set the OIDC_* env vars).</p>
+        </div>
+      </section>
+
+      <!-- Signed in: event controls -->
+      <section id="portal" hidden>
+        <div class="topbar">
+          <h1 style="margin:0">Event controls</h1>
+          <span class="who">Signed in as <b id="adminEmail"></b> · <a href="#" id="logout" class="muted">log out</a></span>
+        </div>
+
+        <details class="panel" open>
+          <summary>Heist availability</summary>
+          <div class="body">
+            <p class="hint">Which heists players can start. Unchecked heists show as Unavailable; takes effect on each new connection.</p>
+            <div id="heistChecks"></div>
+            <button id="saveAvail" class="btn btn--primary" style="margin-top:8px">Save availability</button>
+          </div>
+        </details>
+
+        <details class="panel" open>
+          <summary>Turns per game</summary>
+          <div class="body">
+            <p class="hint">How many turns players get in each heist (1–20). Applies to the next heist a player starts — no redeploy. (The test code always gets unlimited turns.)</p>
+            <div id="turnsRows"></div>
+            <button id="saveTurns" class="btn btn--primary" style="margin-top:8px">Save turns</button>
+          </div>
+        </details>
+
+        <details class="panel" open>
+          <summary>Create user</summary>
+          <div class="body">
+            <p class="hint">Manually register a player (e.g. a conversational booth sign-in). Hand them the generated code to play.</p>
+            <div class="row">
+              <input id="cuFirst" type="text" placeholder="First name" autocomplete="off" />
+              <input id="cuLast" type="text" placeholder="Last name" autocomplete="off" />
+            </div>
+            <div class="row" style="margin-top:8px">
+              <input id="cuEmail" type="text" placeholder="Email" autocomplete="off" />
+              <button id="createUserBtn" class="btn btn--primary">Create</button>
+            </div>
+            <p id="cuResult" class="muted" style="margin-top:12px" hidden></p>
+          </div>
+        </details>
+
+        <details class="panel" open>
+          <summary>Daily winners</summary>
+          <div class="body">
+            <p class="hint">Top scorer per event day, with contact details. Email them their prize manually — no automated email is sent.</p>
+            <div id="winnersList" class="muted">Loading…</div>
+          </div>
+        </details>
+
+        <details class="panel" open>
+          <summary>Players &amp; scores</summary>
+          <div class="body">
+            <p class="hint">Every player who played, grouped by event day (newest first) and ranked by their day's total score (high → low), with name &amp; email. Includes test plays (tagged). Delete a single player's row, or wipe a whole day — plays only (the player's registration is kept). This can't be undone.</p>
+            <div id="scoresList" class="muted">Loading…</div>
+          </div>
+        </details>
+
+        <details class="panel">
+          <summary>Data</summary>
+          <div class="body">
+            <p class="hint">Browse the database tables (read-only). Click a table to load its rows.</p>
+            <div id="tableList" class="table-list"></div>
+            <div id="tableView" hidden>
+              <div class="table-meta">
+                <span id="tableMeta" class="muted"></span>
+                <span class="pager">
+                  <button id="prevPage" class="btn">&lsaquo; Prev</button>
+                  <button id="nextPage" class="btn">Next &rsaquo;</button>
+                </span>
+              </div>
+              <div class="table-scroll"><table id="dataTable"></table></div>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <p id="loading" class="muted">Loading…</p>
+      <div class="powered-by">Powered by <span>&#9673; Deepgram Voice Agent API</span></div>
+    </div>
+
+    <div id="winModal" class="modal" hidden>
+      <div class="modal-card">
+        <div class="modal-head">
+          <span>Winner email draft</span>
+          <button id="winClose" class="modal-x" type="button" aria-label="Close">&#10005;</button>
+        </div>
+        <p class="modal-to muted">To <b id="winTo"></b></p>
+        <label class="modal-label">Subject</label>
+        <div class="modal-field">
+          <input id="winSubject" type="text" readonly />
+          <button class="btn" type="button" data-copy="winSubject">Copy</button>
+        </div>
+        <label class="modal-label">Message</label>
+        <div class="modal-field">
+          <textarea id="winBody" rows="9" readonly></textarea>
+          <button class="btn" type="button" data-copy="winBody">Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    <script type="module" src="/src/admin.js"></script>
+  </body>
+</html>

@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voice Heist — High Scores</title>
+    <!-- Fonts are self-hosted via @fontsource (imported in src/leaderboard.js)
+         so the arcade identity survives conference Wi-Fi with no CDN.
+
+         Layout: gamer-first, own-device viewing. TODAY'S RACE is the hero
+         (live, score bars, badges, YOU highlight); the all-time podium and the
+         latest-cracks pulse ride the side rail; previous days demote to a
+         compact history strip. -->
+    <style>
+      :root {
+        --bg:#07090f; --card:#11161f; --card2:#1a2130; --line:#2b3346;
+        --ink:#eaf2ff; --muted:#8b97ad; --green:#13ef93; --pink:#ee028c;
+        --blue:#14a9fb; --gold:#ffd45e; --silver:#c9d4e4; --bronze:#e0a35c;
+      }
+      * { box-sizing:border-box; }
+      html, body { margin:0; min-height:100vh; }
+      body {
+        color:var(--ink); font:16px/1.5 Inter, system-ui, sans-serif;
+        padding:clamp(18px,3vw,44px); overflow-x:hidden;
+        background:
+          radial-gradient(1200px 760px at 82% -12%, color-mix(in srgb, var(--pink) 16%, transparent) 0%, transparent 60%),
+          radial-gradient(1200px 760px at 8% 0%, color-mix(in srgb, var(--green) 14%, transparent) 0%, transparent 55%),
+          var(--bg);
+      }
+      /* CRT scanlines + vignette */
+      body::before { content:""; position:fixed; inset:0; z-index:50; pointer-events:none;
+        background:radial-gradient(125% 125% at 50% 50%, transparent 55%, rgba(0,0,0,.6) 100%); }
+      body::after { content:""; position:fixed; inset:0; z-index:51; pointer-events:none; opacity:.4;
+        background:repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,.18) 3px, rgba(0,0,0,0) 4px); }
+
+      .head { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:clamp(18px,2.4vw,30px); flex-wrap:wrap; }
+      .brand { font-family:Orbitron, sans-serif; font-weight:800; letter-spacing:5px; color:var(--green);
+        font-size:clamp(14px,1.8vw,20px); text-shadow:0 0 10px color-mix(in srgb, var(--green) 60%, transparent); }
+      .title { font-family:Orbitron, sans-serif; font-weight:900; letter-spacing:6px; margin:0;
+        font-size:clamp(26px,5vw,58px);
+        background:linear-gradient(180deg, #fff, var(--green)); -webkit-background-clip:text; background-clip:text; color:transparent;
+        filter:drop-shadow(0 0 26px color-mix(in srgb, var(--green) 45%, transparent)); }
+      .updated { font-family:Orbitron, sans-serif; color:var(--muted); font-size:12px; letter-spacing:1px; }
+      .play-link { font-family:Orbitron, sans-serif; font-weight:800; letter-spacing:2px;
+        font-size:clamp(13px,1.5vw,16px); color:#07110b; background:var(--green);
+        padding:10px 20px; border-radius:999px; text-decoration:none;
+        box-shadow:0 0 18px color-mix(in srgb, var(--green) 55%, transparent); }
+      .play-link:hover { filter:brightness(1.12); }
+
+      .grid { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr); gap:clamp(14px,1.8vw,26px); align-items:start; }
+      .side { display:grid; gap:clamp(14px,1.8vw,26px); min-width:0; }
+      @media (max-width:920px) { .grid { grid-template-columns:minmax(0,1fr); } }
+
+      .panel { background:linear-gradient(180deg, var(--card), color-mix(in srgb, var(--card) 80%, #000));
+        border:1px solid var(--line); border-radius:20px; padding:clamp(14px,1.6vw,24px);
+        box-shadow:0 20px 60px rgba(0,0,0,.45); position:relative; overflow:hidden; animation:popIn .4s ease-out both; min-width:0; }
+      .panel-head { display:flex; align-items:baseline; gap:10px; margin-bottom:14px; padding-bottom:10px;
+        border-bottom:1px dashed var(--line); font-family:Orbitron, sans-serif; font-weight:800;
+        letter-spacing:3px; font-size:clamp(13px,1.5vw,17px); }
+      .live { color:var(--green); font-size:10px; letter-spacing:2px; animation:pulse 2s ease-in-out infinite; }
+      .reset-inline { margin-left:auto; color:var(--gold); font-family:Orbitron, sans-serif;
+        font-size:11px; font-weight:700; letter-spacing:1px; white-space:nowrap;
+        text-shadow:0 0 10px color-mix(in srgb, var(--gold) 40%, transparent); }
+
+      /* ---- TODAY'S RACE (hero) ---- */
+      .today { border-color:color-mix(in srgb, var(--green) 50%, var(--line));
+        box-shadow:0 0 34px color-mix(in srgb, var(--green) 18%, transparent), 0 20px 60px rgba(0,0,0,.45); }
+      .trow { display:grid; grid-template-columns:46px minmax(0,1fr) auto; gap:12px; align-items:center;
+        padding:10px 12px; border-radius:12px; background:color-mix(in srgb, var(--card2) 55%, transparent); }
+      .trow + .trow { margin-top:7px; }
+      .trank { font-family:Orbitron, sans-serif; font-weight:900; font-size:18px; text-align:center; color:var(--muted); }
+      .trow[data-rank="1"] .trank, .trow[data-rank="2"] .trank, .trow[data-rank="3"] .trank { font-size:24px; }
+      .tmain { min-width:0; }
+      .tname { font-family:Orbitron, sans-serif; font-weight:700; letter-spacing:1px;
+        font-size:clamp(14px,1.5vw,18px); display:flex; align-items:center; min-width:0; white-space:nowrap; }
+      .tname .nm { overflow:hidden; text-overflow:ellipsis; }
+      .bdg { margin-left:7px; font-size:13px; letter-spacing:0; }
+      .you { margin-left:8px; font-size:11px; letter-spacing:2px; color:var(--pink); }
+      .tbar { height:5px; border-radius:3px; margin-top:7px; overflow:hidden;
+        background:color-mix(in srgb, var(--green) 10%, transparent); }
+      .tbar i { display:block; height:100%; border-radius:3px; width:var(--w);
+        background:linear-gradient(90deg, color-mix(in srgb, var(--green) 45%, transparent), var(--green));
+        box-shadow:0 0 10px color-mix(in srgb, var(--green) 55%, transparent);
+        animation:barIn .9s ease-out both; }
+      .tscore { font-family:Orbitron, sans-serif; font-weight:800; font-size:clamp(15px,1.7vw,21px);
+        color:var(--green); text-shadow:0 0 12px color-mix(in srgb, var(--green) 45%, transparent); }
+      .trow.first { border:1px solid color-mix(in srgb, var(--gold) 60%, transparent);
+        background:color-mix(in srgb, var(--gold) 8%, var(--card2));
+        box-shadow:0 0 22px color-mix(in srgb, var(--gold) 25%, transparent); }
+      .trow.first .tname, .trow.first .tscore { color:var(--gold);
+        text-shadow:0 0 14px color-mix(in srgb, var(--gold) 45%, transparent); }
+      .trow.first .tbar i { background:linear-gradient(90deg, color-mix(in srgb, var(--gold) 45%, transparent), var(--gold));
+        box-shadow:0 0 10px color-mix(in srgb, var(--gold) 55%, transparent); }
+      .trow.mine { border:1px solid color-mix(in srgb, var(--pink) 55%, transparent);
+        background:color-mix(in srgb, var(--pink) 9%, var(--card2));
+        box-shadow:0 0 18px color-mix(in srgb, var(--pink) 22%, transparent); }
+      /* A row that climbed since the last poll flashes green — the race moves. */
+      .trow.up-flash { animation:climb 1.6s ease-out; }
+      .tdivider { text-align:center; color:var(--muted); font-size:11px; letter-spacing:5px; padding:5px 0; user-select:none; }
+      .today-empty { padding:30px 10px 24px; text-align:center; color:var(--muted);
+        font-family:Orbitron, sans-serif; letter-spacing:2px; font-size:15px; line-height:2; }
+
+      /* ---- ALL-TIME BEST (podium) ---- */
+      .podium { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; align-items:end; }
+      .pstep { text-align:center; min-width:0; }
+      .pcrown { font-size:16px; height:20px; }
+      .pmedal { width:46px; height:46px; margin:0 auto 6px; border-radius:50%;
+        display:flex; align-items:center; justify-content:center;
+        font-family:Orbitron, sans-serif; font-weight:800; font-size:15px;
+        background:var(--card2); border:2px solid var(--line); color:var(--muted); }
+      .pstep.g1 .pmedal { border-color:var(--gold); color:var(--gold);
+        box-shadow:0 0 16px color-mix(in srgb, var(--gold) 45%, transparent); }
+      .pstep.g2 .pmedal { border-color:var(--silver); color:var(--silver); }
+      .pstep.g3 .pmedal { border-color:var(--bronze); color:var(--bronze); }
+      .pname { font-family:Orbitron, sans-serif; font-size:11px; letter-spacing:.5px;
+        overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .pscore { font-family:Orbitron, sans-serif; font-weight:800; font-size:14px; color:var(--green); }
+      .pstep.g1 .pscore { color:var(--gold); }
+      .pdate { font-size:10px; color:var(--muted); font-family:Orbitron, sans-serif; letter-spacing:1px; }
+      .pblock { margin-top:8px; border-radius:8px 8px 0 0; border:1px solid var(--line); border-bottom:none;
+        display:flex; align-items:center; justify-content:center;
+        font-family:Orbitron, sans-serif; font-weight:900; color:var(--muted); font-size:15px;
+        background:linear-gradient(180deg, var(--card2), transparent); }
+      .pstep.g1 .pblock { height:54px; border-color:color-mix(in srgb, var(--gold) 45%, var(--line)); color:var(--gold); }
+      .pstep.g2 .pblock { height:36px; }
+      .pstep.g3 .pblock { height:26px; }
+      .pstep.ghost { opacity:.55; }
+
+      /* ---- LATEST CRACKS (pulse) ---- */
+      .prow { display:flex; gap:7px; align-items:baseline; padding:8px 2px; font-size:13px; min-width:0;
+        border-bottom:1px dashed color-mix(in srgb, var(--line) 60%, transparent); }
+      .prow:last-child { border-bottom:none; }
+      .pwho { font-family:Orbitron, sans-serif; font-size:11.5px; letter-spacing:.5px; white-space:nowrap;
+        overflow:hidden; text-overflow:ellipsis; }
+      .pverb { color:var(--muted); flex-shrink:0; }
+      .pheist { font-weight:700; white-space:nowrap; }
+      .pplus { color:var(--green); font-family:Orbitron, sans-serif; font-weight:800; font-size:12px; flex-shrink:0; }
+      .pago { margin-left:auto; color:var(--muted); font-size:11px; flex-shrink:0; }
+      .pulse-empty { color:var(--muted); font-size:13px; padding:6px 2px; }
+
+      /* ---- PREVIOUS DAYS (compact history) ---- */
+      .history { margin-top:clamp(16px,2vw,26px); }
+      .history-head { font-family:Orbitron, sans-serif; letter-spacing:3px; color:var(--muted);
+        font-size:12.5px; margin-bottom:10px; }
+      .hgrid { display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:12px; }
+      .hday { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; opacity:.92; }
+      .hdate { font-family:Orbitron, sans-serif; font-weight:700; letter-spacing:1.5px; font-size:12.5px;
+        margin-bottom:8px; color:var(--muted); text-transform:uppercase; }
+      .hrow { display:flex; gap:8px; align-items:center; font-family:Orbitron, sans-serif; font-size:12.5px; padding:3px 0; min-width:0; }
+      .hrank { width:22px; text-align:center; flex-shrink:0; }
+      .hname { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; letter-spacing:.5px; }
+      .hrow.mine .hname { color:var(--pink); }
+      .hscore { font-weight:800; color:var(--green); font-size:12px; flex-shrink:0; }
+      .hmore { margin-top:6px; font-size:10.5px; color:var(--muted); font-family:Orbitron, sans-serif; letter-spacing:1px; }
+
+      .empty, .loading { color:var(--muted); text-align:center; padding:40px 0; font-size:17px;
+        font-family:Orbitron, sans-serif; letter-spacing:2px; }
+      .foot { margin-top:30px; text-align:center; color:var(--green); font-family:Orbitron, sans-serif; letter-spacing:3px;
+        font-size:clamp(12px,1.4vw,15px); text-transform:uppercase; animation:blink 1.6s steps(2,start) infinite;
+        text-shadow:0 0 12px color-mix(in srgb, var(--green) 45%, transparent); }
+      .powered-by { margin-top:16px; text-align:center; font-family:"Fira Code", ui-monospace, monospace;
+        font-size:12px; letter-spacing:1px; color:var(--muted); }
+      .powered-by span { color:var(--green); }
+
+      @keyframes blink { 50% { opacity:.4; } }
+      @keyframes pulse { 50% { opacity:.45; } }
+      @keyframes popIn { from { transform:scale(.97); opacity:0; } to { transform:scale(1); opacity:1; } }
+      @keyframes barIn { from { width:0; } }
+      @keyframes climb {
+        0% { box-shadow:0 0 0 1px var(--green), 0 0 24px color-mix(in srgb, var(--green) 45%, transparent); }
+        100% { box-shadow:none; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .tbar i, .trow.up-flash, .live, .foot, .panel { animation:none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="head">
+      <div class="brand">&#9673; VOICE HEIST</div>
+      <h1 class="title">HIGH SCORES</h1>
+      <a class="play-link" href="/game">&#9654; PLAY NOW</a>
+      <div class="updated" id="updated">LOADING…</div>
+    </div>
+
+    <div class="grid">
+      <!-- The hero: today's live race, score bars relative to the leader. -->
+      <section class="panel today">
+        <div class="panel-head">TODAY'S RACE <span class="live">&#9679; LIVE</span><span class="reset-inline" id="reset"></span></div>
+        <div id="todayRows"><p class="loading">LOADING…</p></div>
+      </section>
+
+      <aside class="side">
+        <section class="panel">
+          <div class="panel-head">ALL-TIME BEST</div>
+          <div id="podium" class="podium"></div>
+        </section>
+        <!-- Proof of other humans: the day's latest cracks. -->
+        <section class="panel">
+          <div class="panel-head">LATEST CRACKS</div>
+          <div id="pulse"></div>
+        </section>
+      </aside>
+    </div>
+
+    <section class="history" id="historyWrap" hidden>
+      <div class="history-head">PREVIOUS DAYS</div>
+      <div class="hgrid" id="history"></div>
+    </section>
+
+    <p class="foot">&#9654; Talk your way past the AI &middot; top the board &middot; each week's top heister takes the Mastermind's Cut (the weekly prize) &middot; <a href="/rules">rules</a></p>
+    <div class="powered-by">Powered by <img src="/deepgram-wordmark.svg" alt="Deepgram" style="height:14px;width:auto;vertical-align:middle" /> <span>Voice Agent API</span></div>
+    <script type="module" src="/src/leaderboard.js"></script>
+  </body>
+</html>

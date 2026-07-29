@@ -1,0 +1,29 @@
+{
+  "name": "voice-heist",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Voice Heist - a browser voice game where you talk an AI gatekeeper into bending its rule. Game brain in Python; low-latency audio via the Deepgram Voice Agent browser SDK.",
+  "scripts": {
+    "dev": "concurrently -k -n brain,client -c green,magenta \"npm:dev:brain\" \"npm:dev:client\"",
+    "dev:brain": ".venv/bin/python -m uvicorn app:app --app-dir brain --port 8000 --reload",
+    "dev:client": "vite",
+    "build": "vite build",
+    "serve": ".venv/bin/python -m uvicorn app:app --app-dir brain --port 8000"
+  },
+  "dependencies": {
+    "@deepgram/agents": "^0.1.1",
+    "@deepgram/styles": "^0.2.15",
+    "@fontsource/fira-code": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/noto-sans": "^5.3.0",
+    "@fontsource/orbitron": "^5.3.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1",
+    "vite": "^8.0.16"
+  },
+  "overrides": {
+    "shell-quote": "1.8.4"
+  }
+}

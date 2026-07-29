@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <title>Voice Heist — Register</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@600&family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root { --bg:#0b0e14; --card:#161b27; --line:#2b3346; --ink:#e7ecf3; --muted:#8b97ad; --primary:#13ef93; }
+      * { box-sizing: border-box; }
+      body { margin:0; min-height:100vh; background:radial-gradient(900px 600px at 50% -10%, #16203a 0%, var(--bg) 55%);
+        color:var(--ink); font:16px/1.5 Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+        display:flex; align-items:center; justify-content:center; padding:24px; }
+      .card { width:min(420px,100%); background:var(--card); border:1px solid var(--line);
+        border-radius:18px; padding:28px 24px; text-align:center; }
+      .brand { font-family:"Fira Code",monospace; font-weight:600; letter-spacing:2px; color:var(--primary); font-size:13px; margin-bottom:18px; }
+      h1 { font-size:23px; margin:0 0 8px; }
+      p.sub { color:var(--muted); margin:0 0 22px; }
+      .btn { display:flex; align-items:center; justify-content:center; gap:10px; width:100%;
+        padding:14px; border-radius:12px; border:1px solid var(--line); background:#1f2533;
+        color:var(--ink); font-size:16px; font-weight:600; cursor:pointer; text-decoration:none; }
+      .btn:active { transform:translateY(1px); }
+      .btn--primary { background:var(--primary); color:#06281b; border-color:transparent; }
+      .code { font-family:"Fira Code",monospace; font-weight:600; font-size:46px; letter-spacing:8px;
+        color:var(--primary); background:#0d1118; border:1px dashed var(--line); border-radius:14px;
+        padding:18px 12px; margin:8px 0 18px; }
+      .muted { color:var(--muted); font-size:14px; }
+      .codename { color:var(--primary); font-family:"Fira Code", monospace; font-weight:600; }
+      .or { display:flex; align-items:center; gap:10px; color:var(--muted); font-size:13px; margin:18px 0; }
+      .or::before, .or::after { content:""; flex:1; height:1px; background:var(--line); }
+      #manualForm { text-align:left; }
+      .row { display:flex; gap:8px; }
+      .inp { width:100%; padding:13px 14px; border-radius:12px; border:1px solid var(--line);
+        background:#0d1118; color:var(--ink); font-size:16px; margin-bottom:8px; }
+      .inp::placeholder { color:var(--muted); }
+      .err { color:#ff5c7a; font-size:14px; margin-top:8px; }
+      .powered-by { position:fixed; left:0; right:0; bottom:14px; text-align:center; font-family:"Fira Code", ui-monospace, monospace;
+        font-size:11px; letter-spacing:1px; color:var(--muted); }
+      .powered-by span { color:var(--primary); }
+      [hidden] { display:none !important; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="brand">&#9673; VOICE HEIST</div>
+
+      <!-- Sign-in view -->
+      <section id="signin" hidden>
+        <h1>Keep your codename</h1>
+        <p class="sub">Register once to keep one codename on the leaderboard across visits &mdash; each week's top heister takes the Mastermind's Cut, the weekly prize. Takes about ten seconds.</p>
+        <a id="signinBtn" class="btn btn--primary" href="/api/auth/oidc/start">Sign in with your account</a>
+        <div id="oauthOr" class="or"><span>or</span></div>
+        <form id="manualForm" novalidate>
+          <div class="row">
+            <input id="firstName" class="inp" placeholder="First name" autocomplete="given-name" />
+            <input id="lastName" class="inp" placeholder="Last name" autocomplete="family-name" />
+          </div>
+          <input id="email" class="inp" type="email" placeholder="Email" autocomplete="email" inputmode="email" />
+          <button type="submit" class="btn">Register with email</button>
+        </form>
+        <p id="manualError" class="err" hidden></p>
+        <p class="muted" style="margin-top:16px">We only use this to verify you and email your score card.</p>
+      </section>
+
+      <!-- Done view: show the player code -->
+      <section id="done" hidden>
+        <h1>You're in!</h1>
+        <p class="sub">This is your player code. Use it with &ldquo;Sign in&rdquo; in the game to pick up your codename.</p>
+        <div id="code" class="code">----</div>
+        <p class="muted" id="codenameLine" hidden>On the leaderboard you'll show up as <strong id="codename" class="codename"></strong>.</p>
+        <p class="muted">Screenshot this &mdash; enter it next time you <a href="/game">play</a> and your scores keep adding up.</p>
+      </section>
+
+      <!-- OAuth not configured -->
+      <section id="unavailable" hidden>
+        <h1>Registration is offline</h1>
+        <p class="sub">Sign-in isn't available right now &mdash; you can still <a href="/game">play</a> and grab a handle in the game.</p>
+      </section>
+
+      <p id="loading" class="muted">Loading…</p>
+    </div>
+    <div class="powered-by">Powered by <span>&#9673; Deepgram Voice Agent API</span></div>
+    <script type="module" src="/src/register.js"></script>
+  </body>
+</html>

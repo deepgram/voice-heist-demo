@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voice Heist — talk your way past the AI</title>
+    <!-- The link unfurl IS the attract screen now that the game is shared by
+         URL. The card image ships at /og-card.png (1200x630); scrapers want an
+         ABSOLUTE og:image URL, so swap in the prod domain before launch. -->
+    <meta name="description" content="Talk your way past an AI gatekeeper — a voice game built on the Deepgram Voice Agent API. 90 seconds, just your voice." />
+    <meta property="og:title" content="Voice Heist — talk your way past the AI" />
+    <meta property="og:description" content="Convince an AI bouncer, a pizza agent, a corporate receptionist, and a retention rep to bend their one rule. Just your voice." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-card.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="/og-card.png" />
+    <!-- Fonts are self-hosted via @fontsource (imported in src/main.js) so the
+         arcade identity survives conference Wi-Fi with no CDN dependency. -->
+  </head>
+  <body>
+    <div id="app" data-phase="lobby" data-connected="false">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">&#9673;</span>
+          <span class="brand-name">VOICE HEIST</span>
+        </div>
+        <div id="scoreHud" class="score-hud" aria-live="polite" hidden>
+          <span class="score-hud-label">Score</span>
+          <span id="scoreHudValue" class="score-hud-value">0</span>
+          <span id="scoreHudPop" class="score-hud-pop" aria-hidden="true"></span>
+        </div>
+        <!-- Day streak (registered players): consecutive event days with a play. -->
+        <span id="streakChip" class="streak-chip" title="Day streak — play every day to keep it" hidden></span>
+        <div class="topbar-right">
+          <!-- Optional leaderboard identity: anonymous sessions get a Sign in
+               button; signed-in players see their codename badge instead. -->
+          <span id="playerBadge" class="player-badge" hidden></span>
+          <button id="signinBtn" class="signin-btn" type="button" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Sign in
+          </button>
+          <button id="newPlayerBtn" class="newplayer-btn" type="button" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Start over
+          </button>
+          <div id="connChip" class="conn-chip" data-state="off" hidden>
+            <span class="conn-dot"></span><span id="connText">Offline</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="stage">
+        <!-- Hero: the orb + agent + primary action (always visible) -->
+        <section class="hero">
+          <div class="orb-stack">
+            <canvas id="orb" width="320" height="320" aria-hidden="true"></canvas>
+          </div>
+          <!-- Names the tech at the moment it performs: visible while an agent speaks. -->
+          <div class="orb-caption" aria-hidden="true">Live on Deepgram Voice Agent</div>
+          <div id="agentName" class="agent-name">Alexis, the Host</div>
+          <!-- The pitch lives here permanently; #status below is for state only. -->
+          <p class="hero-tagline">Sweet-talk AI gatekeepers into breaking their one rule.</p>
+          <p id="status" class="status" aria-live="polite">Click connect to begin.</p>
+          <div id="turnPill" class="turn-pill hidden"></div>
+        <button id="connectBtn" class="dg-btn dg-btn--primary hero-cta">
+          <span class="btn-ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+              <rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 10v1a7 7 0 0 0 14 0v-1" /><line x1="12" y1="19" x2="12" y2="22" />
+            </svg>
+          </span>
+          <span class="btn-label">Connect</span>
+        </button>
+        <!-- Sets the two expectations that kill conversions when they surprise:
+             the mic permission prompt, and how much time a heist takes. -->
+        <p class="mic-note">Uses your mic &mdash; you&rsquo;ll talk your way in. About 2 minutes a heist.</p>
+        <!-- Live social proof beside the CTA: the competition has people in it. -->
+        <p id="heroPulse" class="hero-pulse" hidden></p>
+
+          <!-- In-call controls — a stacked dock in the left rail, beneath the orb.
+               Mute + Back are routine; "End session" wipes it, so it's set apart. -->
+          <div class="controls">
+            <button id="muteBtn" class="dg-btn dg-btn--ghost" disabled>
+              <span class="btn-ic" id="muteIc"></span>
+              <span class="btn-label">Mute mic</span>
+            </button>
+            <button id="lobbyBtn" class="dg-btn dg-btn--ghost" disabled>
+              <span class="btn-ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+                  <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
+                </svg>
+              </span>
+              <span class="btn-label">Back to Host</span>
+            </button>
+            <div class="controls-sep" aria-hidden="true"></div>
+            <button id="finishBtn" class="dg-btn dg-btn--ghost dg-btn--exit" disabled>
+              <span class="btn-ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+              </span>
+              <span class="btn-label">End session</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Lobby: heist menu — header above a single stacked column of cards. -->
+        <section class="lobby-panel">
+          <div class="panel-head">
+            <div class="panel-head-row">
+              <h2 class="panel-title">Choose your heist</h2>
+              <button id="howtoBtn" class="howto-link" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                How to play
+              </button>
+            </div>
+            <p class="panel-sub" id="lobbyHint">
+              Connect, then say which one &mdash; or just tap a card to dive in.
+            </p>
+            <!-- Today's leaderboard leader — the score to beat, named at the moment
+                 of choosing a heist. The full board lives in the hero (#heroBoard). -->
+            <p id="todaysBest" class="todays-best">Checking the board&hellip;</p>
+            <!-- Session goal: x/4 cracked today; flips to CLEAN SWEEP at n/n. -->
+            <p id="sweepMeter" class="sweep-meter" hidden></p>
+          </div>
+          <div id="heistGrid" class="heist-grid"></div>
+          <p class="how-to">
+            Each gatekeeper guards one rule. You get a few turns to talk it into
+            bending &mdash; by being <strong>believable</strong>, not by bullying.
+          </p>
+        </section>
+
+        <!-- High scores rail: the third lobby column. Two acts — the ALL-TIME
+             podium (top three single-day totals ever) and TODAY'S RACE (the
+             live daily board); the full day-by-day history is at /leaderboard.
+             Rendered with a placeholder row so the fetch doesn't shift layout;
+             hidden during a call (the stage becomes the two-column call layout). -->
+        <aside id="boardRail" class="board-rail" aria-label="High scores">
+          <div class="rail-head">
+            <span class="hb-title">High scores</span>
+            <!-- Daily-reset countdown: the board is ephemeral — say so with a clock. -->
+            <span id="railReset" class="hb-reset" hidden></span>
+            <a class="hb-link" href="/leaderboard">Full board &rarr;</a>
+          </div>
+          <div id="boardRailList" class="rail-list">
+            <div class="bd-row bd-hint">Checking the board&hellip;</div>
+          </div>
+        </aside>
+
+        <!-- In-call: live conversation -->
+        <section class="call-panel">
+          <div class="brief">
+            <span class="brief-kicker">Your mark</span>
+            <h2 id="briefTitle">&mdash;</h2>
+            <p id="briefBody"></p>
+            <ul id="briefGoals" class="brief-goals"></ul>
+          </div>
+          <div class="transcript-wrap">
+            <div id="transcript" class="transcript" aria-live="polite"></div>
+          </div>
+        </section>
+      </main>
+
+      <div class="powered-by">Powered by <img src="/deepgram-wordmark.svg" alt="Deepgram" class="dg-wordmark" /> <span>Voice Agent API</span></div>
+
+      <!-- Heist-start cue: names the one rule of the game (say anything!) with
+           the themed quote beneath as the nudge. -->
+      <div id="cueToast" class="cue-toast" aria-live="polite" hidden>
+        <span class="cue-kicker">Say anything &mdash; convince them</span>
+        <span id="cueText" class="cue-text"></span>
+      </div>
+    </div>
+
+    <div id="resultOverlay" class="overlay hidden">
+      <div class="result-card dg-card" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+        <div id="resultBadge" class="result-badge"></div>
+        <h2 id="resultTitle"></h2>
+        <div id="resultScore" class="result-score" hidden></div>
+        <!-- Itemized bonuses (turns to spare, streak, clean sweep) — the score
+             above is the all-in total; this line shows how it was built. -->
+        <p id="resultBonus" class="result-bonus" hidden></p>
+        <p id="resultRank" class="result-rank" hidden></p>
+        <!-- The one to chase: "300 behind Crimson Fox 42" beats a bare rank. -->
+        <p id="resultRival" class="result-rival" hidden></p>
+        <p id="resultPath" class="result-path"></p>
+        <p id="resultReason" class="result-reason"></p>
+        <p id="resultHint" class="result-hint" hidden></p>
+        <p id="resultWho" class="result-who" hidden></p>
+        <!-- Anonymous players with a fresh score can claim it onto the board
+             right here — the peak-attention moment — without losing the plays
+             already recorded against their session. -->
+        <form id="claimForm" class="claim-form" hidden>
+          <p class="claim-lead">Claim this score &mdash; each week's top heister takes the <strong>Mastermind's Cut</strong>, the weekly prize.</p>
+          <input id="claimHandle" class="auth-input" placeholder="Pick a handle" autocomplete="off" maxlength="24" />
+          <input id="claimEmail" class="auth-input" type="email" placeholder="Email (optional &mdash; how winners are contacted)" maxlength="120" />
+          <button type="submit" class="dg-btn dg-btn--ghost">Save my score</button>
+          <p id="claimError" class="auth-error"></p>
+          <p class="auth-foot">Winners are verified and contacted by email &mdash; used for nothing else, deleted after the season. <a href="/rules">Season rules</a></p>
+        </form>
+        <!-- The web's spectator mode: the result travels to the next player. -->
+        <button id="shareBtn" class="dg-btn dg-btn--ghost share-btn" type="button" hidden>Share this score</button>
+        <!-- One-tap momentum: straight to the next heist (or an earned retry)
+             without the Host round-trip. The brain re-validates the pick. -->
+        <button id="resultRetry" class="dg-btn dg-btn--ghost result-retry" type="button" hidden></button>
+        <button id="resultNext" class="dg-btn dg-btn--primary" type="button" hidden></button>
+        <button id="resultContinue" class="dg-btn dg-btn--primary">Back to the Host</button>
+      </div>
+    </div>
+
+    <!-- Day-complete summary: shown after the FINAL heist's result card is
+         dismissed — today's haul, standing, personal best, and the reason to
+         come back tomorrow. -->
+    <div id="dayOverlay" class="overlay hidden">
+      <div class="result-card dg-card day-card" role="dialog" aria-modal="true" aria-labelledby="dayTitle">
+        <div class="result-badge badge-win">THAT'S THE DAY</div>
+        <h2 id="dayTitle"></h2>
+        <div id="dayScore" class="result-score"></div>
+        <p id="dayCracked" class="result-rank"></p>
+        <p id="dayRank" class="result-rank" hidden></p>
+        <p id="dayRival" class="result-rival" hidden></p>
+        <p id="dayBest" class="result-path" hidden></p>
+        <p id="dayStreak" class="result-path" hidden></p>
+        <p id="dayComeback" class="result-reason">The board resets at midnight, but the week's race keeps counting &mdash; come back tomorrow and run it back.</p>
+        <p id="dayClaimNudge" class="result-who" hidden></p>
+        <button id="dayShareBtn" class="dg-btn dg-btn--ghost share-btn" type="button">Share today's haul</button>
+        <button id="dayRetry" class="dg-btn dg-btn--ghost result-retry" type="button" hidden></button>
+        <button id="dayContinue" class="dg-btn dg-btn--primary">Back to the Host</button>
+      </div>
+    </div>
+
+    <!-- How to play: quick strategy guide (opened from the lobby). -->
+    <div id="howtoOverlay" class="overlay hidden">
+      <div class="howto-card dg-card" role="dialog" aria-modal="true" aria-labelledby="howtoTitle">
+        <div class="howto-head">
+          <h2 id="howtoTitle">How to play</h2>
+          <button id="howtoClose" class="howto-close" type="button" aria-label="Close">&times;</button>
+        </div>
+        <p class="howto-rule">
+          Talk each gatekeeper into bending its one rule &mdash; by being
+          <strong>believable</strong>, not by bullying. Be specific, stay calm, and give them
+          <strong>something they can check</strong>. Stuck? Keep talking &mdash; they'll nudge you.
+        </p>
+        <ul class="howto-list">
+          <li>
+            <span class="howto-ic">&#127829;</span>
+            <span class="howto-text">
+              <strong>Level 0 &middot; The Order</strong> &mdash; get the pizza free.
+              <span class="howto-tip"><span class="howto-win">Win: a real problem they can make right</span><span class="howto-lose">Lose: made-up coupons or threats</span></span>
+            </span>
+          </li>
+          <li>
+            <span class="howto-ic">&#128184;</span>
+            <span class="howto-text">
+              <strong>Level 1 &middot; The Refund</strong> &mdash; get the refund.
+              <span class="howto-tip"><span class="howto-win">Win: point to a concrete billing error</span><span class="howto-lose">Lose: "because I said so" or anger</span></span>
+            </span>
+          </li>
+          <li>
+            <span class="howto-ic">&#9742;&#65039;</span>
+            <span class="howto-text">
+              <strong>Level 2 &middot; The Receptionist</strong> &mdash; reach a human.
+              <span class="howto-tip"><span class="howto-win">Win: an exact case number and team</span><span class="howto-lose">Lose: vague "compliance" or threats</span></span>
+            </span>
+          </li>
+          <li>
+            <span class="howto-ic">&#128682;</span>
+            <span class="howto-text">
+              <strong>Level 3 &middot; The List</strong> &mdash; get into the club.
+              <span class="howto-tip"><span class="howto-win">Win: a specific list he can check</span><span class="howto-lose">Lose: "do you know who I am" energy</span></span>
+            </span>
+          </li>
+        </ul>
+        <button id="howtoGo" class="dg-btn dg-btn--primary">Got it &mdash; let's go</button>
+      </div>
+    </div>
+
+    <!-- OPTIONAL sign-in overlay. The booth lands straight in the game (a
+         session is minted silently as anonymous); this card only opens from
+         the topbar "Sign in" button or an OIDC bounce. Quick play PROMOTES the
+         current anonymous session in place, so scores already earned today
+         follow the handle onto the board. Fully closable — never a gate. -->
+    <div id="loginOverlay" class="overlay hidden">
+      <div class="auth-card dg-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+        <button id="authClose" class="auth-close" type="button" aria-label="Close">&times;</button>
+        <div class="auth-brand"><span class="brand-mark">&#9673;</span> VOICE HEIST</div>
+        <h2 id="authTitle">Get your name on the board</h2>
+        <p class="auth-sub" id="authSub">Pick a handle and today's scores count under your codename &mdash; each week's top heister takes the Mastermind's Cut, the weekly prize.</p>
+        <form id="quickForm" class="auth-form auth-form--stack">
+          <input id="quickInput" class="auth-input" placeholder="Pick a handle" autocomplete="off" maxlength="24" />
+          <input id="quickEmail" class="auth-input" type="email" placeholder="Email (optional &mdash; how winners are contacted)" autocomplete="email" maxlength="120" />
+          <button type="submit" class="dg-btn dg-btn--primary">Put me on the board</button>
+        </form>
+        <div class="auth-divider"><span>or</span></div>
+        <form id="codeForm" class="auth-form">
+          <input id="codeInput" class="auth-input" placeholder="Guest code (e.g. 7F2K)" autocomplete="off" maxlength="8" />
+          <button type="submit" class="dg-btn dg-btn--ghost">Play with code</button>
+        </form>
+        <a id="deepgramSigninBtn" class="dg-btn dg-btn--ghost auth-cta" href="/api/auth/oidc/start?dest=game">Sign in with Deepgram</a>
+        <button id="justPlayBtn" class="dg-btn dg-btn--ghost auth-cta" type="button">No thanks &mdash; just play</button>
+        <p id="loginError" class="auth-error"></p>
+        <p class="auth-foot">Registering is optional &mdash; grab a code at <a href="/register">/register</a> to keep one codename on the leaderboard across visits. <a href="/rules">Season rules</a></p>
+      </div>
+    </div>
+
+    <!-- Arcade FX layers (position:fixed; harmless if unused). -->
+    <canvas id="fxCanvas" aria-hidden="true"></canvas>
+    <div id="scoreCue" class="score-cue" aria-hidden="true"></div>
+
+    <!-- Coaching hint pop — lower-right corner, after an off-track turn. -->
+    <div id="hintPop" class="hint-pop" hidden aria-live="polite">
+      <span class="hint-pop-kicker">Psst…</span>
+      <span id="hintText" class="hint-pop-text"></span>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

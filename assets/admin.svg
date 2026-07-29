@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="800" viewBox="0 0 1600 800" role="img" aria-label="Voice Heist admin board">
+<title>Voice Heist — Admin board</title>
+<desc>The admin board: four heist rows, each with a turn-cap input and a Live toggle. The Order (8 turns, live), The Refund (5, live), The Receptionist (7, live), and The List (3, disabled). A note says changes apply to the next session and there is no sign-in.</desc>
+<defs>
+<radialGradient id="adGreen" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#13ef93" stop-opacity="0.16"/><stop offset="100%" stop-color="#13ef93" stop-opacity="0"/></radialGradient>
+<radialGradient id="adBlue" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#14a9fb" stop-opacity="0.18"/><stop offset="100%" stop-color="#14a9fb" stop-opacity="0"/></radialGradient>
+<filter id="adNeon" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+
+<rect width="1600" height="800" rx="20" fill="#07090f"/>
+<ellipse cx="170" cy="120" rx="460" ry="320" fill="url(#adGreen)"/>
+<ellipse cx="1430" cy="60" rx="560" ry="360" fill="url(#adBlue)"/>
+
+<g font-family="ui-monospace,'SF Mono','Cascadia Mono','DejaVu Sans Mono',monospace">
+
+<!-- header -->
+<circle cx="62" cy="66" r="11" fill="#13ef93" filter="url(#adNeon)"/>
+<text x="84" y="74" font-size="25" font-weight="bold" letter-spacing="5" fill="#13ef93">VOICE HEIST</text>
+<text x="800" y="92" text-anchor="middle" font-size="68" font-weight="bold" letter-spacing="10" fill="#5dffb1" filter="url(#adNeon)">ADMIN</text>
+<text x="1530" y="74" text-anchor="end" font-size="20" letter-spacing="2" fill="#13ef93">SAVED ✓</text>
+
+<!-- note -->
+<rect x="250" y="120" width="1100" height="56" rx="12" fill="none" stroke="#2b3346" stroke-width="1.5" stroke-dasharray="2 7"/>
+<text x="800" y="154" text-anchor="middle" font-size="18" fill="#8b97ad">Changes apply to the <tspan fill="#13ef93" font-weight="bold">next session</tspan> — no restart needed.   <tspan fill="#ffd45e" font-weight="bold">No sign-in</tspan>: anyone who can reach it can edit it.</text>
+
+<!-- ===== row 1: The Order (8, live) ===== -->
+<rect x="250" y="210" width="1100" height="100" rx="16" fill="#11161f" stroke="#2b3346" stroke-width="1.5"/>
+<text x="290" y="257" font-size="24" font-weight="bold" fill="#eaf2ff">The Order</text>
+<text x="290" y="284" font-size="13" letter-spacing="1" fill="#8b97ad">order</text>
+<text x="1160" y="241" text-anchor="middle" font-size="11" letter-spacing="2" fill="#8b97ad">TURNS</text>
+<rect x="1123" y="248" width="74" height="40" rx="10" fill="#07090f" stroke="#2b3346" stroke-width="1.5"/>
+<text x="1160" y="276" text-anchor="middle" font-size="22" font-weight="bold" fill="#eaf2ff">8</text>
+<text x="1295" y="241" text-anchor="middle" font-size="11" letter-spacing="2" fill="#8b97ad">LIVE</text>
+<rect x="1268" y="247" width="54" height="30" rx="15" fill="#143a2c" stroke="#1f7d5a" stroke-width="1.5"/>
+<circle cx="1307" cy="262" r="11" fill="#13ef93" filter="url(#adNeon)"/>
+
+<!-- ===== row 2: The Refund (5, live) ===== -->
+<rect x="250" y="326" width="1100" height="100" rx="16" fill="#11161f" stroke="#2b3346" stroke-width="1.5"/>
+<text x="290" y="373" font-size="24" font-weight="bold" fill="#eaf2ff">The Refund</text>
+<text x="290" y="400" font-size="13" letter-spacing="1" fill="#8b97ad">refund</text>
+<text x="1160" y="357" text-anchor="middle" font-size="11" letter-spacing="2" fill="#8b97ad">TURNS</text>
+<rect x="1123" y="364" width="74" height="40" rx="10" fill="#07090f" stroke="#2b3346" stroke-width="1.5"/>
+<text x="1160" y="392" text-anchor="middle" font-size="22" font-weight="bold" fill="#eaf2ff">5</text>
+<text x="1295" y="357" text-anchor="middle" font-size="11" letter-spacing="2" fill="#8b97ad">LIVE</text>
+<rect x="1268" y="363" width="54" height="30" rx="15" fill="#143a2c" stroke="#1f7d5a" stroke-width="1.5"/>
+<circle cx="1307" cy="378" r="11" fill="#13ef93" filter="url(#adNeon)"/>
+
+<!-- ===== row 3: The Receptionist (7, live) ===== -->
+<rect x="250" y="442" width="1100" height="100" rx="16" fill="#11161f" stroke="#2b3346" stroke-width="1.5"/>
+<text x="290" y="489" font-size="24" font-weight="bold" fill="#eaf2ff">The Receptionist</text>
+<text x="290" y="516" font-size="13" letter-spacing="1" fill="#8b97ad">receptionist</text>
+<text x="1160" y="473" text-anchor="middle" font-size="11" letter-spacing="2" fill="#8b97ad">TURNS</text>
+<rect x="1123" y="480" width="74" height="40" rx="10" fill="#07090f" stroke="#2b3346" stroke-width="1.5"/>
+<text x="1160" y="508" text-anchor="middle" font-size="22" font-weight="bold" fill="#eaf2ff">7</text>
+<text x="1295" y="473" text-anchor="middle" font-size="11" letter-spacing="2" fill="#8b97ad">LIVE</text>
+<rect x="1268" y="479" width="54" height="30" rx="15" fill="#143a2c" stroke="#1f7d5a" stroke-width="1.5"/>
+<circle cx="1307" cy="494" r="11" fill="#13ef93" filter="url(#adNeon)"/>
+
+<!-- ===== row 4: The List (3, disabled) ===== -->
+<g opacity="0.5">
+<rect x="250" y="558" width="1100" height="100" rx="16" fill="#11161f" stroke="#2b3346" stroke-width="1.5"/>
+<text x="290" y="605" font-size="24" font-weight="bold" fill="#eaf2ff">The List</text>
+<text x="290" y="632" font-size="13" letter-spacing="1" fill="#8b97ad">list</text>
+<text x="1160" y="589" text-anchor="middle" font-size="11" letter-spacing="2" fill="#8b97ad">TURNS</text>
+<rect x="1123" y="596" width="74" height="40" rx="10" fill="#07090f" stroke="#2b3346" stroke-width="1.5"/>
+<text x="1160" y="624" text-anchor="middle" font-size="22" font-weight="bold" fill="#eaf2ff">3</text>
+<text x="1295" y="589" text-anchor="middle" font-size="11" letter-spacing="2" fill="#8b97ad">LIVE</text>
+<rect x="1268" y="595" width="54" height="30" rx="15" fill="#1a2130" stroke="#2b3346" stroke-width="1.5"/>
+<circle cx="1283" cy="610" r="11" fill="#8b97ad"/>
+</g>
+
+<!-- actions -->
+<text x="1090" y="722" text-anchor="end" font-size="15" letter-spacing="1" fill="#8b97ad">&#8592; back to game</text>
+<rect x="1180" y="698" width="170" height="50" rx="12" fill="#13ef93"/>
+<text x="1265" y="730" text-anchor="middle" font-size="18" font-weight="bold" letter-spacing="2" fill="#07110b">SAVE</text>
+
+</g>
+</svg>

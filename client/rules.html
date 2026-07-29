@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voice Heist — Season Rules</title>
+    <!-- Static season-rules page (linked from the claim form, sign-in card, and
+         the leaderboard footer). Same standalone pattern as leaderboard.html:
+         inline styles + fonts imported in src/rules.js. Copy is the contract
+         with players — keep it honest and keep it current. Running your own
+         season? Fill in YOUR dates and prize in "The season & the prize". -->
+    <style>
+      :root {
+        --bg:#07090f; --card:#11161f; --line:#2b3346;
+        --ink:#eaf2ff; --muted:#8b97ad; --green:#13ef93;
+        --blue:#14a9fb; --gold:#ffd45e;
+      }
+      * { box-sizing:border-box; }
+      html, body { margin:0; min-height:100vh; }
+      body {
+        color:var(--ink); font:16px/1.6 Inter, system-ui, sans-serif;
+        padding:clamp(18px,3vw,44px); overflow-x:hidden;
+        background:
+          radial-gradient(1000px 700px at 85% -10%, color-mix(in srgb, var(--blue) 13%, transparent) 0%, transparent 60%),
+          radial-gradient(1000px 700px at 5% 0%, color-mix(in srgb, var(--green) 12%, transparent) 0%, transparent 55%),
+          var(--bg);
+      }
+      /* CRT vignette + scanlines (below any future overlays) */
+      body::before { content:""; position:fixed; inset:0; z-index:50; pointer-events:none;
+        background:radial-gradient(125% 125% at 50% 50%, transparent 55%, rgba(0,0,0,.6) 100%); }
+      body::after { content:""; position:fixed; inset:0; z-index:51; pointer-events:none; opacity:.35;
+        background:repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,.18) 3px, rgba(0,0,0,0) 4px); }
+
+      main { max-width:760px; margin:0 auto; }
+      .head { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:clamp(16px,2.4vw,26px); }
+      .brand { font-family:Orbitron, sans-serif; font-weight:800; letter-spacing:5px; color:var(--green);
+        font-size:clamp(14px,1.8vw,20px); text-shadow:0 0 10px color-mix(in srgb, var(--green) 60%, transparent); }
+      .back { font-family:"Fira Code", monospace; font-size:12px; letter-spacing:1px; text-transform:uppercase;
+        color:var(--muted); text-decoration:none; border:1px solid color-mix(in srgb, var(--muted) 40%, transparent);
+        border-radius:999px; padding:6px 14px; }
+      .back:hover { color:var(--ink); border-color:color-mix(in srgb, var(--green) 50%, transparent); }
+      h1 { font-family:Orbitron, sans-serif; font-weight:700; letter-spacing:2px;
+        font-size:clamp(20px,3vw,28px); margin:0 0 6px; }
+      .sub { color:var(--muted); margin:0 0 26px; }
+      section { background:var(--card); border:1px solid var(--line); border-radius:.75rem;
+        padding:18px 20px; margin-bottom:14px; }
+      .kicker { font-family:"Fira Code", monospace; font-size:11px; letter-spacing:2px;
+        text-transform:uppercase; color:var(--green); margin:0 0 8px; }
+      section p { margin:0 0 10px; }
+      section p:last-child { margin-bottom:0; }
+      .cut { color:var(--gold); font-weight:600; }
+      a { color:var(--blue); }
+      .foot { color:var(--muted); font-size:13px; margin-top:22px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="head">
+        <span class="brand">&#9673; VOICE HEIST</span>
+        <a class="back" href="/game">&larr; Back to the game</a>
+      </div>
+      <h1>Season rules</h1>
+      <p class="sub">The short version: play fair, claim your score, and the week's top heister takes the weekly prize.</p>
+
+      <section>
+        <p class="kicker">The game</p>
+        <p>You talk your way past AI gatekeepers. Each heist you crack earns points; your score for a day is the total across that day's heists. Every heist can be played once per day.</p>
+      </section>
+
+      <section>
+        <p class="kicker">The season &amp; the prize</p>
+        <p>Prize weeks run <strong>Monday to Sunday</strong> on the event clock (the same clock the daily board resets on). Season dates are announced by whoever's running the game.</p>
+        <p>Each week's top total takes the <span class="cut">Mastermind's Cut</span> — the weekly prize.</p>
+      </section>
+
+      <section>
+        <p class="kicker">Getting on the board</p>
+        <p>Playing needs no sign-up at all. To compete, claim your score with a codename — takes one tap. Adding an email is optional, but winners are contacted by email: <strong>no email, no drop</strong>.</p>
+      </section>
+
+      <section>
+        <p class="kicker">Fair play</p>
+        <p>One codename per human. Charm the characters, not the machinery — runs that attack the scoring system itself (for example, telling the judge to ignore its instructions) are disqualified. We review winning runs before any prize ships.</p>
+        <p>The folks running the game are welcome to play for glory, but can't take the Cut.</p>
+      </section>
+
+      <section>
+        <p class="kicker">Winning &amp; shipping</p>
+        <p>We email each week's winner. Reply with a shipping address within 14 days — replying also confirms the address is really yours. No reply, and the Cut passes to the runner-up.</p>
+        <p>We ship wherever we reasonably can; if we can't ship to you, we'll sort out an alternative or the Cut passes down the board.</p>
+      </section>
+
+      <section>
+        <p class="kicker">Privacy</p>
+        <p>Emails are used only to contact winners — no marketing, no sharing — and are deleted after the season. The public leaderboard shows codenames only, never names or emails.</p>
+      </section>
+
+      <section>
+        <p class="kicker">House rules</p>
+        <p>We may tune scoring or these rules mid-season to keep things fair; changes land on this page. On close calls, the house's call is final. No purchase necessary — the game is free to play.</p>
+      </section>
+
+      <p class="foot">Questions? Find us at <a href="https://deepgram.com">deepgram.com</a>. Now get back in there — the board won't top itself.</p>
+    </main>
+    <script type="module" src="/src/rules.js"></script>
+  </body>
+</html>

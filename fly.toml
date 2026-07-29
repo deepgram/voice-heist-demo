@@ -1,0 +1,42 @@
+# Fly.io config for Voice Heist.
+# Rename the app to deploy your own copy (`fly apps create <your-name>`).
+app = "voice-heist-demo"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # Keep one machine warm so a voice session isn't interrupted by a cold start.
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 1
+
+[env]
+  # SQLite lives on the mounted volume so player/score data survives deploys.
+  VH_DB_PATH = "/data/voice-heist.db"
+  # Periodic same-volume snapshots (restore points). Offsite replication needs
+  # the LITESTREAM_* secrets — see entrypoint.sh.
+  VH_BACKUP_DIR = "/data/backups"
+  # https in prod (force_https), so the auth cookies must be Secure.
+  COOKIE_SECURE = "true"
+  # Drives the daily "one play per scenario per day" reset AND the Mon–Sun
+  # weekly prize windows. Settled for the Aug–Sept season: do NOT change
+  # mid-campaign — a boundary shift corrupts day/week/streak semantics.
+  EVENT_TZ = "America/Los_Angeles"
+  # Secrets (SITE_PASSWORD, AUTH_SIGNING_SECRET, OIDC_CLIENT_SECRET, and the
+  # OIDC_ISSUER/OIDC_CLIENT_ID/OIDC_REDIRECT_URI config) are set via
+  # `fly secrets set ...`, not here.
+
+[mounts]
+  # Create once: fly volumes create vh_data --size 1 --region iad
+  source = "vh_data"
+  destination = "/data"
+
+# Sized up for the Aug–Sept prize season: SQLite-on-volume pins the app to a
+# single machine, so this one VM is the whole capacity ceiling.
+[[vm]]
+  size = "shared-cpu-2x"
+  memory = "1gb"
