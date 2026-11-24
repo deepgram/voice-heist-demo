@@ -1225,6 +1225,16 @@ body {
 :root {
   --font-arcade: var(--font-sans);
 }
+/* Scores read as numbers on a scoreboard: Azeret Mono. */
+.score-value,
+.score-pop,
+.score-hud-value,
+.score-hud-pop,
+.result-score,
+.bd-score,
+.pod-score {
+  font-family: var(--font-mono);
+}
 
 /* Buttons, on the kit: full pills with the label type (Azeret Mono, uppercase
    via the label metrics). Primary is the kit's CTA (magenta on ink, one per
