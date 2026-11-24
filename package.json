@@ -13,7 +13,9 @@
   },
   "dependencies": {
     "@deepgram/agents": "^0.1.1",
-    "@deepgram/styles": "^0.2.15"
+    "@deepgram/styles": "^0.2.15",
+    "@fontsource/azeret-mono": "^5.3.0",
+    "@fontsource/work-sans": "^5.3.0"
   },
   "devDependencies": {
     "concurrently": "^9.0.1",

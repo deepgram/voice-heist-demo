@@ -1,3 +1,4 @@
+import "./fonts.js";
 // Phone registration page. Runs on the attendee's own device (reached via the
 // booth QR), NOT on the shared kiosk. Two ways to register:
 //   1. OAuth: "Sign in" -> /api/auth/oidc/start -> provider login -> callback -> reg cookie.

@@ -1,3 +1,4 @@
+import "./fonts.js";
 // Public arcade HIGH SCORES board (anyone with the URL). No game/audio deps —
 // polls /api/leaderboard and renders a gamer-first layout: TODAY'S RACE as the
 // hero (live score bars, badges, YOU highlight, movement flashes), the all-time

@@ -12,3 +12,7 @@ These files are copied from Deepgram's brand UI kit, `@deepgram-devs/dg-brand-ui
 Vite copies `client/public/` into `dist/` as is, so the pages link these at `/vdui/...`.
 
 Don't edit these files. To upgrade the kit, copy the same files again from the new tag's `assets/` folder (or run `npx vdui-assets client/public/vdui` in a checkout that has the kit installed) and update the version above.
+
+## One local change
+
+`brand.css` here has the kit's Google Fonts `@import` removed. The fonts are self-hosted instead (`@fontsource/work-sans` and `@fontsource/azeret-mono`, imported in `src/fonts.js`), so the game doesn't wait on Google at a booth with bad Wi-Fi. When you recopy `brand.css`, delete that `@import` line again.

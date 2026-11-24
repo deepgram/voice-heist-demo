@@ -1,3 +1,4 @@
+import "./fonts.js";
 // Admin portal — event controls for the Deepgram team.
 // The page is inert without a valid vh_admin cookie; all data/actions are
 // guarded server-side by require_admin. This just drives the UI.

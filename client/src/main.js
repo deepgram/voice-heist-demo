@@ -1,3 +1,4 @@
+import "./fonts.js";
 // Fonts (Work Sans, Azeret Mono) come from the kit's /vdui/brand.css, linked in index.html.
 import "@deepgram/styles"; // base reset + .dg-btn/.dg-card structure; tokens remapped to the kit in styles.css
 import "./styles.css"; // our layout, imported after so it can layer on top
