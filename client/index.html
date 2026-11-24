@@ -19,10 +19,11 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="/og-card.png" />
     <!-- Deepgram brand UI kit (@deepgram-devs/dg-brand-ui, copied into
-         public/vdui): tokens, Work Sans + Azeret Mono. -->
+         public/vdui): tokens, Work Sans + Azeret Mono, and the voice ring. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="/vdui/brand.css" />
+    <script src="/vdui/ring-element/deepgram-voice-ring.js"></script>
   </head>
   <body>
     <div id="app" data-phase="lobby" data-connected="false">
@@ -60,7 +61,7 @@
         <!-- Hero: the orb + agent + primary action (always visible) -->
         <section class="hero">
           <div class="orb-stack">
-            <canvas id="orb" width="320" height="320" aria-hidden="true"></canvas>
+            <deepgram-voice-ring id="orb" state="listening" aria-hidden="true"></deepgram-voice-ring>
           </div>
           <!-- Names the tech at the moment it performs: visible while an agent speaks. -->
           <div class="orb-caption" aria-hidden="true">Live on Deepgram Voice Agent</div>

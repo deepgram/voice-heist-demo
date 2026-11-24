@@ -1233,157 +1233,37 @@ export function dismissDaySummary() {
   if (_dismissDay) _dismissDay();
 }
 
-// ---- orb visualizer -------------------------------------------------------
-// A faithful vanilla port of Deepgram's "signature hoop" Orb (@deepgram/ui),
-// driven by state + input/output volume. Four rotating bezier hoops; idle is a
-// tight breathing ring, listening expands with mic volume, talking reacts to the
-// agent's voice. Tuned to the brand green/blue.
+// ---- voice ring ------------------------------------------------------------
+// The kit's <deepgram-voice-ring> (public/vdui/ring-element), driven by the same
+// three getters the old canvas orb used. The element reads `state` as an
+// attribute (listening | thinking | speaking) and `level` (0..1) as a property;
+// it handles its own animation and prefers-reduced-motion.
 //
 // startOrb(getMode, getInput, getOutput):
 //   getMode()   -> "idle" | "listening" | "talking"
 //   getInput()  -> user mic volume 0..1
 //   getOutput() -> agent output volume 0..1
-const PI = (e) => Math.PI * e;
-const _pt = (p, r, a) => ({ x: p.x + r * Math.cos(a), y: p.y + r * Math.sin(a) });
-const _lerp = (a, b, t) => t * (b - a) + a;
-const _clamp01 = (e) => Math.min(1, Math.max(0, e));
-const _ease = (e) => (e < 0.5 ? 2 * e * e : 1 - (-2 * e + 2) ** 2 / 2);
-const _avg = (arr, t) => {
-  const n = arr.slice(t, t + 10);
-  return n.reduce((a, b) => a + b, 0) / (n.length || 1);
-};
-
-function _orbRings(colors) {
-  const c = {
-    primary: (colors?.[0] ?? "#13ef93") + "cc",
-    secondary: (colors?.[1] ?? "#ee028c") + "cc",
-    lightPurple: "#ae63f9cc",
-    lightBlue: "#14a9fbcc",
-    green: "#a1f9d4cc",
-    transparent: "transparent",
-  };
-  return [
-    { segments: [{ pct: 0.42, color: c.transparent }, { pct: 0.61, color: c.secondary }], startAngle: 3.52, speedMultiplier: 1.21, centerOffset: { x: 0.01, y: -0.01 }, radiusOffset: 0.02, width: 3.38 },
-    { segments: [{ pct: 0.28, color: c.primary }, { pct: 0.62, color: c.secondary }, { pct: 0.8, color: c.transparent }], startAngle: 1.59, speedMultiplier: 0.64, centerOffset: { x: -0.03, y: -0.01 }, radiusOffset: 0.05, width: 2.39 },
-    { segments: [{ pct: 0.1, color: c.transparent }, { pct: 0.31, color: c.green }, { pct: 0.45, color: c.lightBlue }, { pct: 0.66, color: c.lightPurple }], startAngle: 2.86, speedMultiplier: 0.94, centerOffset: { x: 0.02, y: 0.02 }, radiusOffset: -0.06, width: 2.64 },
-    { segments: [{ pct: 0.1, color: c.lightPurple }, { pct: 0.5, color: c.transparent }, { pct: 0.9, color: c.green }], startAngle: 5.67, speedMultiplier: 1.3, centerOffset: { x: -0.01, y: 0.01 }, radiusOffset: 0.04, width: 2.95 },
-  ];
-}
-
-const _speed = (s) => (s === "talking" ? 1 : s === "listening" ? 0.7 : 0.2);
-const _deflation = (s) => (s === "talking" ? 0.55 : s === "listening" ? 0 : 1);
-const _rocking = (s) => (s === "talking" ? 0 : s === "listening" ? PI(1 / 15) : PI(0.5));
-
-function _gradient(ctx, off, angle, segments) {
-  const ox = ctx.canvas.width / 2;
-  const oy = ctx.canvas.height / 2;
-  const g = ctx.createLinearGradient(
-    ox * (1 - Math.cos(angle) + off.x), oy * (1 - Math.sin(angle) + off.y),
-    ox * (1 + Math.cos(angle) + off.x), oy * (1 + Math.sin(angle) + off.y)
-  );
-  segments.forEach(({ pct, color }) => g.addColorStop(pct, color));
-  return g;
-}
-
-function _drawHoop(ctx, off, radius, deflation, startAngle, stroke) {
-  const center = { x: (ctx.canvas.width / 2) * (1 + off.x), y: (ctx.canvas.height / 2) * (1 + off.y) };
-  const ctrl = radius * (4 / 3) * Math.tan(PI(1 / 8));
-  ctx.strokeStyle = stroke;
-  ctx.beginPath();
-  const d = startAngle + PI(0.5);
-  const u = startAngle + PI(1.5);
-  ctx.arc(center.x, center.y, radius, d, u, false);
-  const f = _pt(center, radius, u);
-  const p = PI(1.5) - startAngle;
-  const g = Math.cos(p) * radius;
-  const m = _pt(_pt(center, radius, startAngle), g * deflation * 2, PI(0.5));
-  const h = _pt(center, radius, d);
-  const c1 = _pt(f, ctrl, u + PI(0.5));
-  const c2 = _pt(m, ctrl, startAngle + PI(1.5));
-  ctx.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, m.x, m.y);
-  const c3 = _pt(m, ctrl, startAngle + PI(0.5));
-  const c4 = _pt(h, ctrl, d + PI(1.5));
-  ctx.bezierCurveTo(c3.x, c3.y, c4.x, c4.y, h.x, h.y);
-  ctx.stroke();
-}
-
-function _drawOrb(ctx, st, delta, rings) {
-  st.time += delta * _lerp(1, st.speed, st.deflation);
-  const since = performance.now() - st.transitionStart;
-  if (st.deflation !== st.targetDeflation) {
-    const e = _ease(_clamp01(since / (st.targetDeflation > st.startDeflation ? 1000 : 300)));
-    st.deflation = e >= 1 ? st.targetDeflation : _lerp(st.startDeflation, st.targetDeflation, e);
-  }
-  if (st.rockingAngle !== st.targetRocking) {
-    const e = _ease(_clamp01(since / 1000));
-    st.rockingAngle = e >= 1 ? st.targetRocking : _lerp(st.startRocking, st.targetRocking, e);
-  }
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  const a = Math.min(ctx.canvas.width, ctx.canvas.height) / 2;
-  const scale = a / 100; // keep line/shadow proportions consistent at any backing res
-  const breathe = 1 + 0.02 * Math.sin((st.time * PI(1)) / 3 / 1000) * _lerp(1, 0, st.deflation);
-  const s = _ease(st.deflation);
-  const reactAgent = st.targetDeflation > 0.3 && st.targetDeflation < 1;
-  rings.forEach((ring, r) => {
-    ctx.lineWidth = ring.width * scale;
-    ctx.shadowColor = ring.segments[0].color;
-    ctx.shadowBlur = 1.1 * ring.width * scale;
-    let rad = 0.8 * a * breathe;
-    if (st.targetDeflation === 0 && st.deflation < 0.05) {
-      const e = Math.min(0.7, _avg(st.userNoise, 3 * r));
-      rad = Math.min(rad * (1 + e * 0.15 * 2), 0.92 * a);
-    }
-    const grad = _gradient(ctx, ring.centerOffset, ring.startAngle + (st.time * PI(1)) / 1000 / 6 * ring.speedMultiplier, ring.segments);
-    let d = s;
-    if (reactAgent) d = s * (1 - 0.4 * _avg(st.agentNoise, 3 * r));
-    _drawHoop(ctx, ring.centerOffset, rad + ring.radiusOffset * rad, d, PI(1.5) + Math.sin((st.time * PI(2)) / 3 / 1000) * st.rockingAngle, grad);
-  });
-}
-
 export function startOrb(getMode, getInput, getOutput) {
-  const ctx = els.orb.getContext("2d");
-  const rings = _orbRings(["#13ef95", "#149afb"]);
-  const reducedMotion =
-    window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let mode = getMode();
-  const st = {
-    time: 0,
-    speed: _speed(mode),
-    deflation: _deflation(mode),
-    rockingAngle: _rocking(mode),
-    agentNoise: Array(22).fill(0),
-    userNoise: Array(22).fill(0),
-    targetDeflation: _deflation(mode),
-    targetRocking: _rocking(mode),
-    transitionStart: 0,
-    startDeflation: _deflation(mode),
-    startRocking: _rocking(mode),
-  };
-  // Reduced motion: draw one static frame instead of the animation loop — the
-  // orb stays as the visual anchor without the constant movement.
-  if (reducedMotion) {
-    _drawOrb(ctx, st, 16, rings);
-    return;
-  }
-  let last = performance.now();
-  function frame(now) {
-    const delta = now - last;
-    last = now;
-    const m = getMode();
-    if (m !== mode) {
-      mode = m;
-      st.speed = _speed(m);
-      st.transitionStart = performance.now();
-      st.startDeflation = st.deflation;
-      st.startRocking = st.rockingAngle;
-      st.targetDeflation = _deflation(m);
-      st.targetRocking = _rocking(m);
+  const ring = els.orb;
+  if (!ring) return;
+  let shown = "";
+  function frame() {
+    const mode = getMode();
+    // The connection chip already knows when the agent is thinking (the reply
+    // latency); the ring shows the same beat.
+    const state =
+      mode === "talking" ? "speaking"
+      : mode === "listening" && els.connChip.dataset.state === "thinking" ? "thinking"
+      : "listening";
+    if (state !== shown) {
+      ring.setAttribute("state", state);
+      shown = state;
     }
-    st.agentNoise.shift();
-    st.agentNoise.push(getOutput ? getOutput() : 0);
-    st.userNoise.shift();
-    st.userNoise.push(getInput ? getInput() : 0);
-    _drawOrb(ctx, st, delta, rings);
+    const level =
+      mode === "talking" ? (getOutput ? getOutput() : 0)
+      : mode === "listening" ? (getInput ? getInput() : 0)
+      : 0;
+    ring.level = Math.min(1, Math.max(0, level));
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
