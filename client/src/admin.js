@@ -134,7 +134,7 @@ async function copyText(text, btn) {
     ta.remove();
   }
   const prev = btn.textContent;
-  btn.textContent = "Copied!";
+  btn.textContent = "Copied";
   setTimeout(() => (btn.textContent = prev), 1400);
 }
 

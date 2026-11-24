@@ -8,37 +8,42 @@
     <title>Voice Heist — Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@600&family=Inter:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Deepgram brand UI kit: tokens, fonts, utilities (copied into public/vdui).
+         Admin is a back-office tool, so it sits on the kit's paper surface. -->
+    <link rel="stylesheet" href="/vdui/brand.css" />
     <style>
-      :root { --bg:#0b0e14; --card:#161b27; --card2:#1f2533; --line:#2b3346; --ink:#e7ecf3; --muted:#8b97ad; --primary:#13ef93; --danger:#ff5c7a; }
+      /* Page roles on the kit's paper tokens; magenta is the action color only. */
+      :root { --bg:var(--color-paper); --card:var(--color-card); --card2:var(--color-paper); --line:var(--color-line);
+        --ink:var(--color-fg); --muted:var(--color-muted); --primary:var(--color-magenta); --danger:var(--color-red); }
       * { box-sizing: border-box; }
-      body { margin:0; min-height:100vh; background:radial-gradient(900px 600px at 50% -10%, #16203a 0%, var(--bg) 55%);
-        color:var(--ink); font:15px/1.5 Inter, -apple-system, BlinkMacSystemFont, sans-serif; padding:32px 20px; }
+      body { margin:0; min-height:100vh; background:var(--bg);
+        color:var(--ink); font:15px/1.5 var(--font-sans); padding:32px 20px; }
       .wrap { max-width:560px; margin:0 auto; }
-      .brand { font-family:"Fira Code",monospace; font-weight:600; letter-spacing:2px; color:var(--primary); font-size:13px; }
-      h1 { font-size:22px; margin:6px 0 2px; }
+      .brand { color:var(--ink); }
+      .brand .dot { color:var(--color-magenta); }
+      h1 { font-size:24px; font-weight:600; margin:6px 0 2px; }
       .sub { color:var(--muted); margin:0 0 22px; font-size:14px; }
-      .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin-bottom:16px; }
-      .card h2 { font-size:15px; margin:0 0 4px; }
-      .card p.hint { color:var(--muted); font-size:13px; margin:0 0 14px; }
-      .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:10px;
-        border:1px solid var(--line); background:var(--card2); color:var(--ink); font-size:14px; font-weight:600; cursor:pointer; }
-      .btn:hover:not(:disabled) { border-color:var(--primary); }
+      .admin-card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin-bottom:16px; }
+      .admin-card h2 { font-size:15px; margin:0 0 4px; }
+      .admin-card p.hint { color:var(--muted); font-size:13px; margin:0 0 14px; }
+      .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 18px; border-radius:999px;
+        border:1px solid color-mix(in srgb, var(--color-fg) 25%, transparent); background:transparent; color:var(--ink); cursor:pointer;
+        font-family:var(--font-mono); font-size:.75rem; font-weight:500; line-height:1rem; letter-spacing:.08em; text-transform:uppercase; text-decoration:none; }
+      .btn:focus-visible { outline:2px solid var(--color-magenta); outline-offset:4px; }
+      .btn:hover:not(:disabled) { border-color:var(--ink); }
       .btn:disabled { opacity:.5; cursor:not-allowed; }
-      .btn--primary { background:var(--primary); color:#06281b; border-color:transparent; }
+      .btn--primary, .btn--primary:hover:not(:disabled) { background:var(--primary); color:var(--color-ink); border-color:transparent; }
+      .btn--primary:hover:not(:disabled) { filter:brightness(1.1); }
       .btn--danger { background:transparent; color:var(--danger); border-color:color-mix(in srgb, var(--danger) 50%, transparent); }
       .btn--danger:hover:not(:disabled) { border-color:var(--danger); }
       .row { display:flex; gap:10px; align-items:center; }
       .check { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; margin-bottom:8px; cursor:pointer; }
-      .check input { width:18px; height:18px; accent-color:var(--primary); }
+      .check input { width:18px; height:18px; accent-color:var(--ink); }
       .check .name { font-weight:600; }
-      .check .id { color:var(--muted); font-family:"Fira Code",monospace; font-size:12px; margin-left:auto; }
+      .check .id { color:var(--muted); font-family:var(--font-mono); font-size:12px; margin-left:auto; }
       input[type=text], input[type=password] { flex:1; min-width:0; padding:10px 12px; border-radius:10px; border:1px solid var(--line);
-        background:#0d1118; color:var(--ink); font-size:14px; }
-      input:focus { outline:none; border-color:var(--primary); }
+        background:var(--card); color:var(--ink); font-size:14px; }
+      input:focus { outline:none; border-color:var(--ink); }
       .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
       .who { color:var(--muted); font-size:13px; }
       .who b { color:var(--ink); }
@@ -56,69 +61,69 @@
       .panel > summary::-webkit-details-marker { display:none; }
       .panel > summary::before { content:"▸"; color:var(--muted); font-size:12px; transition:transform .15s ease; }
       .panel[open] > summary::before { transform:rotate(90deg); }
-      .panel > summary:hover { color:var(--primary); }
+      .panel > summary:hover { color:var(--ink); }
       .panel .body { padding:0 20px 18px; }
       .panel .body .hint { margin-top:0; }
       /* data browser */
       .table-list { display:flex; flex-wrap:wrap; gap:8px; }
       .table-chip { padding:8px 12px; border:1px solid var(--line); border-radius:10px; background:var(--card2);
         color:var(--ink); cursor:pointer; font-size:13px; display:inline-flex; gap:8px; align-items:center; }
-      .table-chip:hover { border-color:var(--primary); }
-      .table-chip.active { border-color:var(--primary); color:var(--primary); }
-      .table-chip .ct { color:var(--muted); font-family:"Fira Code",monospace; font-size:11px; }
+      .table-chip:hover { border-color:var(--ink); }
+      .table-chip.active { border-color:var(--ink); color:var(--ink); }
+      .table-chip .ct { color:var(--muted); font-family:var(--font-mono); font-size:11px; }
       .table-meta { display:flex; justify-content:space-between; align-items:center; gap:10px; margin:16px 0 8px; font-size:13px; }
       .pager .btn { padding:6px 10px; }
       .table-scroll { overflow:auto; max-height:440px; border:1px solid var(--line); border-radius:10px; }
       #dataTable { border-collapse:collapse; width:100%; font-size:12.5px; }
       #dataTable th, #dataTable td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--line);
         white-space:nowrap; max-width:340px; overflow:hidden; text-overflow:ellipsis; }
-      #dataTable th { position:sticky; top:0; background:#0d1118; font-family:"Fira Code",monospace; font-size:11px;
-        color:var(--muted); letter-spacing:.3px; }
-      #dataTable tbody tr:hover td { background:rgba(255,255,255,.03); }
+      #dataTable th { position:sticky; top:0; background:var(--card); font-family:var(--font-mono); font-size:11px;
+        color:var(--muted); }
+      #dataTable tbody tr:hover td { background:var(--bg); }
       [hidden] { display:none !important; }
-      code { font-family:"Fira Code",monospace; background:#0d1118; border:1px solid var(--line); border-radius:5px; padding:1px 5px; font-size:12px; }
+      code { font-family:var(--font-mono); background:var(--card); border:1px solid var(--line); border-radius:5px; padding:1px 5px; font-size:12px; }
       /* daily winners */
       .winner-row { display:grid; grid-template-columns:auto 1fr auto auto; gap:14px; align-items:center;
         padding:9px 0; border-bottom:1px solid var(--line); font-size:13px; }
       .winner-row:last-child { border-bottom:none; }
-      .winner-day { font-family:"Fira Code",monospace; color:var(--muted); white-space:nowrap; }
+      .winner-day { font-family:var(--font-mono); color:var(--muted); white-space:nowrap; }
       .winner-name { font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
       .winner-email { color:var(--muted); white-space:nowrap; }
-      .winner-score { font-family:"Fira Code",monospace; color:var(--primary); font-weight:700; white-space:nowrap; }
+      .winner-score { font-family:var(--font-mono); color:var(--ink); font-weight:700; white-space:nowrap; }
       /* players & scores */
       .score-day { margin:0 0 18px; }
       .score-day:last-child { margin-bottom:0; }
       .score-day-head { display:flex; align-items:center; gap:10px; margin:0 0 6px; }
-      .score-day-head .day { font-family:"Fira Code",monospace; color:var(--ink); font-weight:700; font-size:13px; }
+      .score-day-head .day { font-family:var(--font-mono); color:var(--ink); font-weight:700; font-size:13px; }
       .score-day-head .meta { color:var(--muted); font-size:12px; }
       .score-day-head .btn { margin-left:auto; padding:5px 10px; font-size:12px; }
       .score-row { display:grid; grid-template-columns:22px 1fr auto auto; gap:4px 12px; align-items:center;
         padding:9px 0; border-bottom:1px solid var(--line); font-size:13px; }
       .score-row:last-child { border-bottom:none; }
-      .score-rank { font-family:"Fira Code",monospace; color:var(--muted); }
+      .score-rank { font-family:var(--font-mono); color:var(--muted); }
       .score-who { min-width:0; }
       .score-who .nm { font-weight:600; }
       .score-who .em { display:block; color:var(--muted); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-      .score-who .tier { font-family:"Fira Code",monospace; font-size:10px; text-transform:uppercase; letter-spacing:.5px;
+      .score-who .tier { font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em;
         color:var(--muted); border:1px solid var(--line); border-radius:5px; padding:0 5px; margin-left:6px; }
-      .score-total { font-family:"Fira Code",monospace; color:var(--primary); font-weight:700; white-space:nowrap; }
+      .score-total { font-family:var(--font-mono); color:var(--ink); font-weight:700; white-space:nowrap; }
       .score-del { background:transparent; border:1px solid color-mix(in srgb, var(--danger) 40%, transparent);
         color:var(--danger); border-radius:8px; padding:4px 9px; font-size:12px; line-height:1; cursor:pointer; }
       .score-del:hover { border-color:var(--danger); }
       .score-plays { grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:5px; margin:2px 0 0 34px; }
-      .score-chip { font-size:11px; font-family:"Fira Code",monospace; color:var(--muted);
+      .score-chip { font-size:11px; font-family:var(--font-mono); color:var(--muted);
         border:1px solid var(--line); border-radius:6px; padding:1px 6px; }
-      .score-chip.win { color:var(--primary); border-color:color-mix(in srgb, var(--primary) 40%, transparent); }
+      .score-chip.win { color:var(--ink); border-color:var(--color-lime); }
       .score-chip.lose { color:var(--danger); border-color:color-mix(in srgb, var(--danger) 35%, transparent); }
-      .win-mail { display:inline-block; font:600 11px/1.4 inherit; color:var(--primary); background:transparent; cursor:pointer;
+      .win-mail { display:inline-block; font:600 11px/1.4 inherit; color:var(--ink); background:transparent; cursor:pointer;
         text-decoration:none; margin-left:8px; border:1px solid color-mix(in srgb, var(--primary) 35%, transparent);
         border-radius:6px; padding:2px 8px; white-space:nowrap; }
-      .win-mail:hover { border-color:var(--primary); background:color-mix(in srgb, var(--primary) 12%, transparent); }
+      .win-mail:hover { border-color:var(--ink); background:color-mix(in srgb, var(--primary) 12%, transparent); }
       /* winner-email popup */
       .modal { position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center;
-        padding:20px; background:rgba(3,6,12,.66); }
+        padding:20px; background:rgb(29 29 29 / .5); }
       .modal-card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px;
-        width:100%; max-width:520px; box-shadow:0 18px 50px rgba(0,0,0,.5); }
+        width:100%; max-width:520px; box-shadow:0 18px 50px rgb(29 29 29 / .18); }
       .modal-head { display:flex; align-items:center; justify-content:space-between; font-weight:700; margin-bottom:12px; }
       .modal-x { background:transparent; border:none; color:var(--muted); font-size:16px; cursor:pointer; line-height:1; }
       .modal-x:hover { color:var(--ink); }
@@ -128,31 +133,31 @@
       .modal-field { display:flex; gap:8px; align-items:flex-start; margin-bottom:14px; }
       .modal-field:last-child { margin-bottom:0; }
       #winModal input, #winModal textarea { flex:1; min-width:0; padding:10px 12px; border-radius:10px; border:1px solid var(--line);
-        background:#0d1118; color:var(--ink); font:13px/1.5 inherit; resize:vertical; }
-      #winModal input:focus, #winModal textarea:focus { outline:none; border-color:var(--primary); }
+        background:var(--card); color:var(--ink); font:13px/1.5 inherit; resize:vertical; }
+      #winModal input:focus, #winModal textarea:focus { outline:none; border-color:var(--ink); }
       .modal-field .btn { padding:9px 12px; font-size:13px; white-space:nowrap; }
       /* turns per game */
       .turns-row { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; margin-bottom:8px; }
       .turns-row .name { font-weight:600; }
-      .turns-row .id { color:var(--muted); font-family:"Fira Code",monospace; font-size:12px; }
+      .turns-row .id { color:var(--muted); font-family:var(--font-mono); font-size:12px; }
       .turns-row input { width:72px; margin-left:auto; padding:8px 10px; border-radius:8px; border:1px solid var(--line);
-        background:#0d1118; color:var(--ink); font-size:14px; text-align:center; }
-      .turns-row input:focus { outline:none; border-color:var(--primary); }
-      .powered-by { text-align:center; margin-top:26px; font-family:"Fira Code", ui-monospace, monospace;
-        font-size:11px; letter-spacing:1px; color:var(--muted); }
-      .powered-by span { color:var(--primary); }
+        background:var(--card); color:var(--ink); font-size:14px; text-align:center; }
+      .turns-row input:focus { outline:none; border-color:var(--ink); }
+      .powered-by { text-align:center; margin-top:26px; font-family:var(--font-mono);
+        font-size:11px; color:var(--muted); }
+      .powered-by span { color:var(--ink); font-weight:500; }
     </style>
   </head>
   <body>
     <div class="wrap">
-      <div class="brand">&#9673; VOICE HEIST · ADMIN</div>
+      <div class="brand label"><span class="dot">&#9673;</span> Voice Heist · Admin</div>
 
       <!-- Signed out -->
       <section id="signin" hidden>
         <h1>Admin sign-in</h1>
         <p class="sub">Deepgram team only.</p>
         <div id="denied" class="denied" hidden>That account isn't a verified <b>@deepgram.com</b> address. Try again with your Deepgram account.</div>
-        <div class="card">
+        <div class="admin-card">
           <a id="signinBtn" class="btn btn--primary" href="/api/admin/login">Sign in with Deepgram</a>
           <p id="noauth" class="muted" style="margin-top:12px" hidden>OAuth isn't configured on this server (set the OIDC_* env vars).</p>
         </div>
