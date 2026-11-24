@@ -1,24 +1,57 @@
-/* Voice Heist styling, built on the Deepgram design system (@deepgram/styles).
-   Uses Deepgram tokens (--color-dg-*, --font-dg-*, --radius/spacing/shadow-dg-*)
-   and the real .dg-btn / .dg-card components; this file adds game layout. */
+/* Voice Heist styling, on Deepgram's brand UI kit (@deepgram-devs/dg-brand-ui).
+   /vdui/brand.css (linked from each page) supplies the kit's tokens
+   (--color-*, --font-sans, --font-mono), fonts, and utilities. @deepgram/styles
+   is still imported for its base reset and .dg-btn/.dg-card structure; its
+   tokens are remapped to the kit's below, so it draws in kit colors and type.
+   This file adds the game's layout. */
 
 :root {
-  color-scheme: dark; /* force the dark theme for light-dark() tokens */
+  color-scheme: dark; /* the game is a dark, on-stage screen */
 
-  --vh-bg: var(--color-dg-background);
-  --vh-panel: var(--color-dg-charcoal);
-  --vh-panel-2: color-mix(in srgb, var(--color-dg-charcoal) 70%, var(--color-dg-pebble));
-  --vh-border: var(--color-dg-border);
-  --vh-text: var(--color-dg-text);
-  --vh-muted: var(--color-dg-muted);
-  --vh-primary: var(--color-dg-primary);
-  --vh-secondary: var(--color-dg-secondary);
-  --vh-win: var(--color-dg-success);
-  --vh-lose: var(--color-dg-danger);
+  /* @deepgram/styles tokens -> kit tokens */
+  --dg-primary: var(--color-lime);
+  --dg-secondary: var(--color-violet-3);
+  --color-dg-primary: var(--color-lime);
+  --color-dg-secondary: var(--color-violet-3);
+  --color-dg-background: var(--color-ink);
+  --color-dg-almost-black: var(--color-ink);
+  --color-dg-charcoal: var(--color-ink-2);
+  --color-dg-pebble: var(--color-ink-3);
+  --color-dg-border: rgb(255 255 255 / 0.12);
+  --color-dg-slate: rgb(255 255 255 / 0.3);
+  --color-dg-text: var(--color-paper);
+  --color-dg-fog: var(--color-paper);
+  --color-dg-platinum: var(--color-paper);
+  --color-dg-muted: var(--color-faint);
+  --color-dg-solid: var(--color-paper);
+  --color-dg-on-solid: var(--color-ink);
+  --color-dg-success: var(--color-lime);
+  --color-dg-danger: var(--color-red);
+  --color-dg-warning: var(--color-orange);
+  --font-dg-sans: var(--font-sans);
+  --font-dg-noto: var(--font-sans);
+  --font-dg-mono: var(--font-mono);
+
+  /* The game's own roles, on kit colors. Lime is live/good/won (scores, the
+     live dot, goals); violet is the voice; magenta is kept for the one next
+     action (.dg-btn--primary) and is set there, not here. */
+  --vh-bg: var(--color-ink);
+  --vh-panel: var(--color-ink-2);
+  --vh-panel-2: var(--color-ink-3);
+  --vh-border: rgb(255 255 255 / 0.12);
+  --vh-text: var(--color-paper);
+  --vh-muted: rgb(252 250 248 / 0.8); /* the kit's muted text on the stage */
+  --vh-primary: var(--color-lime);
+  --vh-secondary: var(--color-violet-3);
+  --vh-win: var(--color-lime);
+  --vh-lose: var(--color-red);
 }
 
 * {
   box-sizing: border-box;
+}
+html {
+  background: var(--color-ink);
 }
 html,
 body {
@@ -26,16 +59,11 @@ body {
   height: 100%;
 }
 body {
-  /* Four corner glows (green/blue up top, violet/green below) so big-monitor
-     margins read as staged lighting around the arcade, not dead space. */
-  background:
-    radial-gradient(900px 600px at 78% -12%, color-mix(in srgb, var(--vh-secondary) 16%, transparent) 0%, transparent 60%),
-    radial-gradient(900px 600px at 12% 0%, color-mix(in srgb, var(--vh-primary) 12%, transparent) 0%, transparent 55%),
-    radial-gradient(1100px 700px at 88% 106%, color-mix(in srgb, #8b5cf6 8%, transparent) 0%, transparent 60%),
-    radial-gradient(1000px 650px at 6% 98%, color-mix(in srgb, var(--vh-primary) 7%, transparent) 0%, transparent 55%),
-    var(--vh-bg);
+  /* The kit's stage texture (violet grain over ink), fixed so it frames the
+     whole arcade on tall pages. */
+  background: var(--color-ink) url("/vdui/textures/stage.webp") center / cover no-repeat fixed;
   color: var(--vh-text);
-  font-family: var(--font-dg-sans);
+  font-family: var(--font-sans);
 }
 
 #app {
@@ -77,7 +105,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
 }
 .brand-mark {
   color: var(--vh-primary);
@@ -85,7 +113,7 @@ body {
 }
 .brand-name {
   font-weight: 600;
-  letter-spacing: clamp(3px, 0.2vw, 4px);
+  letter-spacing: normal;
   font-size: clamp(13px, 0.85vw, 16px);
 }
 .topbar-right {
@@ -98,10 +126,10 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 1px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--vh-secondary);
   background: color-mix(in srgb, var(--vh-secondary) 10%, transparent);
@@ -124,9 +152,9 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 12px;
-  letter-spacing: 1px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--vh-muted);
   background: var(--vh-panel);
@@ -278,6 +306,7 @@ body {
   line-height: 0;
 }
 #orb {
+  display: block;
   width: 240px;
   height: 240px;
   transition: width 0.3s ease, height 0.3s ease;
@@ -287,10 +316,10 @@ body {
   height: 190px;
 }
 .agent-name {
-  font-family: var(--font-dg-noto);
+  font-family: var(--font-sans);
   /* Fluid: 22px on laptops, easing to 26px on big monitors — no breakpoint snap. */
   font-size: clamp(22px, 1.45vw, 26px);
-  font-weight: 700;
+  font-weight: 600;
 }
 /* The permanent pitch — what the game IS. #status below only reports state. */
 .hero-tagline {
@@ -306,7 +335,7 @@ body {
 /* Expectation-setting under the CTA: the mic ask + the time a heist takes. */
 .mic-note {
   margin: 0;
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 11.5px;
   color: var(--vh-muted);
   max-width: 340px;
@@ -317,9 +346,9 @@ body {
 /* Live social proof beside the CTA — the competition has people in it. */
 .hero-pulse {
   margin: 2px 0 0;
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 11.5px;
-  color: color-mix(in srgb, #ffd45e 80%, var(--vh-muted));
+  color: color-mix(in srgb, var(--color-yellow) 80%, var(--vh-muted));
 }
 #app[data-connected="true"] .hero-pulse {
   display: none;
@@ -338,10 +367,10 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  font-weight: 600;
+  letter-spacing: normal;
   color: var(--vh-text);
   background: var(--vh-panel);
   border: 1px solid var(--vh-border);
@@ -374,7 +403,7 @@ body {
   animation: turnTick 0.45s ease-out, pulse 1s ease-in-out infinite;
 }
 .turn-dots {
-  letter-spacing: 4px;
+  letter-spacing: normal;
   font-size: 17px;
   color: var(--vh-primary);
 }
@@ -397,11 +426,11 @@ body {
   text-align: left;
 }
 .panel-title {
-  font-family: var(--font-dg-noto);
+  font-family: var(--font-sans);
   /* Shrinks before it wraps — the arcade face two-lining reads broken. */
   font-size: clamp(15px, 1.5vw, 24px);
   white-space: nowrap;
-  font-weight: 700;
+  font-weight: 600;
   margin: 0 0 4px;
 }
 .panel-sub {
@@ -464,7 +493,7 @@ body {
   border: 1px solid var(--vh-border);
   background: var(--vh-panel);
   color: var(--vh-text);
-  font-family: var(--font-dg-sans);
+  font-family: var(--font-sans);
   cursor: pointer;
   transition: border-color 0.18s ease, transform 0.06s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
@@ -498,7 +527,7 @@ body {
   min-width: 0;
 }
 .heist-title {
-  font-family: var(--font-dg-noto);
+  font-family: var(--font-sans);
   font-weight: 600;
   font-size: 16px;
   display: flex;
@@ -509,21 +538,21 @@ body {
   flex-wrap: wrap;
 }
 .heist-tone {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 10px;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--vh-secondary);
-  border: 1px solid color-mix(in srgb, var(--vh-secondary) 40%, transparent);
+  color: var(--vh-muted);
+  border: 1px solid rgb(255 255 255 / 0.3);
   border-radius: 999px;
   padding: 1px 7px;
 }
 /* Difficulty-ladder badge ("LVL 0".."LVL 3") on each heist card. */
 .heist-level {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  font-weight: 600;
+  letter-spacing: normal;
   flex-shrink: 0;
   color: var(--color-dg-on-solid);
   background: var(--vh-primary);
@@ -541,9 +570,9 @@ body {
 .heist-status {
   flex-shrink: 0;
   align-self: flex-start;
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 4px 10px;
   border-radius: 999px;
@@ -559,7 +588,7 @@ body {
   border-color: var(--vh-win);
 }
 .heist-card[data-status="lose"] .heist-status {
-  color: var(--color-white);
+  color: var(--color-paper);
   background: var(--vh-lose);
   border-color: var(--vh-lose);
 }
@@ -599,9 +628,9 @@ body {
 }
 .heist-card.played .heist-locked {
   display: block;
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.4px;
+  letter-spacing: normal;
   color: var(--vh-muted);
   margin-top: 3px;
 }
@@ -630,17 +659,17 @@ body {
   box-shadow: var(--shadow-dg-sm);
 }
 .brief-kicker {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 10px;
-  letter-spacing: 1.5px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--vh-secondary);
 }
 .brief h2 {
   margin: 4px 0 6px;
-  font-family: var(--font-dg-noto);
+  font-family: var(--font-sans);
   font-size: 19px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .brief p {
   margin: 0 0 10px;
@@ -691,16 +720,16 @@ body {
   display: none;
 }
 .cue-kicker {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 9px;
-  letter-spacing: 1.5px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--vh-primary);
 }
 .cue-text {
-  font-family: var(--font-dg-noto);
+  font-family: var(--font-sans);
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   font-style: italic;
   color: var(--vh-text);
 }
@@ -745,7 +774,7 @@ body {
 .turn-who {
   font-size: 11px;
   color: var(--vh-muted);
-  letter-spacing: 0.4px;
+  letter-spacing: normal;
 }
 .turn-text {
   background: var(--vh-panel-2);
@@ -756,15 +785,16 @@ body {
   line-height: 1.45;
 }
 .turn-user .turn-text {
-  background: var(--vh-primary);
-  color: var(--color-dg-on-solid);
+  /* The caller's words, in the kit's voice-session violet */
+  background: var(--color-violet);
+  color: var(--color-paper);
   font-weight: 500;
 }
 .turn-system {
   align-self: center;
   color: var(--vh-muted);
   font-size: 12px;
-  letter-spacing: 1px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 4px 0;
 }
@@ -822,8 +852,8 @@ body {
   color: var(--vh-muted);
 }
 .controls .dg-btn--exit:hover:not(:disabled) {
-  color: #ff6b6b;
-  border-color: color-mix(in srgb, #ff6b6b 45%, var(--vh-border));
+  color: var(--color-red);
+  border-color: color-mix(in srgb, var(--color-red) 45%, var(--vh-border));
 }
 .btn-ic {
   display: inline-flex;
@@ -866,9 +896,9 @@ body {
 }
 .result-badge {
   display: inline-block;
-  font-family: var(--font-dg-mono);
-  font-weight: 700;
-  letter-spacing: 2px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: normal;
   font-size: 13px;
   padding: 6px 14px;
   border-radius: 999px;
@@ -880,13 +910,13 @@ body {
 }
 .badge-lose {
   background: var(--vh-lose);
-  color: var(--color-white);
+  color: var(--color-paper);
 }
 .result-card h2 {
   margin: 0 0 10px;
-  font-family: var(--font-dg-noto);
+  font-family: var(--font-sans);
   font-size: 22px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .result-path {
   color: var(--vh-primary);
@@ -914,7 +944,7 @@ body {
   content: "The move you missed";
   display: block;
   margin-bottom: 4px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--vh-primary);
 }
 .result-hint[hidden] {
@@ -948,18 +978,19 @@ body {
   align-items: center;
 }
 .auth-brand {
-  font-family: var(--font-dg-mono);
-  font-weight: 700;
-  letter-spacing: 2px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   font-size: 13px;
   color: var(--vh-primary);
   margin-bottom: 14px;
 }
 .auth-card h2 {
   margin: 0 0 8px;
-  font-family: var(--font-dg-noto);
+  font-family: var(--font-sans);
   font-size: 21px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .auth-sub {
   color: var(--vh-muted);
@@ -992,9 +1023,9 @@ body {
   min-width: 0;
   padding: 10px 13px;
   border-radius: 10px;
-  border: 1px solid var(--color-dg-border, #2b3346);
-  background: var(--color-dg-surface, #0f1420);
-  color: var(--vh-ink, #e7ecf3);
+  border: 1px solid var(--vh-border);
+  background: rgb(255 255 255 / 0.05);
+  color: var(--vh-text);
   font-size: 15px;
 }
 .auth-input:focus {
@@ -1014,10 +1045,10 @@ body {
   content: "";
   flex: 1;
   height: 1px;
-  background: var(--color-dg-border, #2b3346);
+  background: var(--vh-border);
 }
 .auth-error {
-  color: var(--vh-lose, #ff5c7a);
+  color: var(--vh-lose, var(--color-red));
   font-size: 13px;
   min-height: 18px;
   margin: 12px 0 0;
@@ -1045,9 +1076,9 @@ body {
 }
 .howto-head h2 {
   margin: 0;
-  font-family: var(--font-dg-noto);
+  font-family: var(--font-sans);
   font-size: 22px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .howto-close {
   background: none;
@@ -1120,10 +1151,10 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.5px;
+  letter-spacing: normal;
   color: var(--vh-text);
   background: var(--vh-panel);
   border: 1px solid color-mix(in srgb, var(--vh-primary) 45%, var(--vh-border));
@@ -1149,7 +1180,7 @@ body {
   right: 10px;
   top: -12px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--vh-primary);
   opacity: 0;
   pointer-events: none;
@@ -1166,8 +1197,8 @@ body {
   100% { opacity: 0; transform: translateY(-18px) scale(1); }
 }
 .result-score {
-  font-family: var(--font-dg-mono);
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-weight: 600;
   font-size: 30px;
   color: var(--vh-primary);
   margin: 0 0 12px;
@@ -1176,9 +1207,9 @@ body {
   display: none;
 }
 .result-who {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 12px;
-  letter-spacing: 0.4px;
+  letter-spacing: normal;
   color: var(--vh-muted);
   margin: 0 0 16px;
 }
@@ -1187,84 +1218,98 @@ body {
 }
 
 /* ===========================================================================
-   ARCADE SKIN — tasteful neon on the existing Deepgram theme (booth mode).
-   Same palette + orb; adds a display font, CRT atmosphere, neon glow, and
-   punchy score/result juice. Everything below layers on top without changing
-   the layout. ============================================================= */
+   GAME LAYER — the arcade's personality on the kit's type and color: score
+   pops, the result moment, confetti. Display type is the kit's Work Sans (the
+   Orbitron face is gone); scores use Azeret Mono. No neon text glow or CRT
+   scanlines: the stage texture carries the atmosphere. ====================== */
 :root {
-  --font-arcade: "Orbitron", var(--font-dg-sans);
+  --font-arcade: var(--font-sans);
 }
 
-/* CRT atmosphere over the stage only (non-interactive). Kept BELOW the result /
-   sign-in overlays, confetti, and cues (z 10+), so the atmosphere layer never
-   dims the celebration it's meant to frame. Lightened for booth-TV zoom, where
-   heavy scanlines read as dark bars across body text. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
-  background: radial-gradient(125% 125% at 50% 50%, transparent 56%, rgba(0, 0, 0, 0.35) 100%);
-}
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 6;
-  pointer-events: none;
-  opacity: 0.25;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0) 0,
-    rgba(0, 0, 0, 0) 2px,
-    rgba(0, 0, 0, 0.16) 3px,
-    rgba(0, 0, 0, 0) 4px
-  );
-}
-
-/* Buttons render their copy as written — the design system's `capitalize`
-   turns "Just play — no sign-in" into title case. */
+/* Buttons, on the kit: full pills with the label type (Azeret Mono, uppercase
+   via the label metrics). Primary is the kit's CTA (magenta on ink, one per
+   screen); ghost is the kit's dark pill (white/30 outline). */
 .dg-btn {
-  text-transform: none;
+  height: 3rem;
+  padding-inline: 1.5rem;
+  gap: 0.5rem;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: filter 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+.dg-btn:focus-visible {
+  outline: 2px solid var(--color-magenta);
+  outline-offset: 4px;
+}
+.dg-btn--primary,
+.dg-btn--primary:hover {
+  background: var(--color-magenta);
+  background-image: none;
+  color: var(--color-ink);
+  border: 2px solid rgb(255 255 255 / 0.25);
+  box-shadow: 0 0 40px -6px rgb(224 66 255 / 0.7);
+}
+.dg-btn--primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+.dg-btn--ghost {
+  background: transparent;
+  color: var(--color-paper);
+  border: 1px solid rgb(255 255 255 / 0.3);
+}
+.dg-btn--ghost:hover:not(:disabled) {
+  background: rgb(255 255 255 / 0.1);
+  color: var(--color-paper);
+  border-color: rgb(255 255 255 / 0.3);
+  box-shadow: none;
+}
+/* One magenta action per screen: when the result card offers "next heist",
+   "Back to the Host" steps down to a ghost pill. */
+.result-card:has(#resultNext:not([hidden])) #resultContinue {
+  background: transparent;
+  color: var(--color-paper);
+  border: 1px solid rgb(255 255 255 / 0.3);
+  box-shadow: none;
 }
 
-/* Brand mark + titles: neon */
-.brand-name {
-  font-family: var(--font-arcade);
-  letter-spacing: 5px;
-  text-shadow:
-    0 0 8px color-mix(in srgb, var(--vh-primary) 55%, transparent),
-    0 0 22px color-mix(in srgb, var(--vh-primary) 28%, transparent);
+/* Cards and overlays: the kit's glass on the stage (rounded-3xl). */
+.dg-card {
+  background: rgb(29 29 29 / 0.82);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 1.5rem;
 }
-.brand-mark {
-  text-shadow: 0 0 12px var(--vh-primary);
+
+/* Brand mark + titles. The app name is a label (the kit's only uppercase);
+   headings are sentence case in Work Sans. */
+.brand-name {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 .panel-title {
   font-family: var(--font-arcade);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  text-shadow: 0 0 10px color-mix(in srgb, var(--vh-secondary) 45%, transparent);
-}
-.agent-name {
-  text-shadow: 0 0 16px color-mix(in srgb, var(--vh-primary) 25%, transparent);
+  font-weight: 600;
 }
 
-/* Connect CTA: pulsing "press to play" glow */
+/* Connect CTA: the kit's large CTA (h-16, magenta glow) */
 .hero-cta {
-  font-family: var(--font-arcade);
-  letter-spacing: 1px;
-  animation: ctaPulse 2.1s ease-in-out infinite;
-}
-@keyframes ctaPulse {
-  0%, 100% { box-shadow: 0 0 14px color-mix(in srgb, var(--vh-primary) 40%, transparent); }
-  50% { box-shadow: 0 0 28px color-mix(in srgb, var(--vh-primary) 78%, transparent); }
+  height: 4rem;
+  padding-inline: 2rem;
+  font-size: 0.95rem;
 }
 
 /* Heist cards: arcade select grid */
 .heist-title {
   font-family: var(--font-arcade);
-  letter-spacing: 0.5px;
+  letter-spacing: normal;
 }
 .heist-card:hover:not(:disabled) {
   box-shadow:
@@ -1282,15 +1327,13 @@ body::after {
 }
 .score-value {
   font-family: var(--font-arcade);
-  font-weight: 800;
-  text-shadow: 0 0 10px color-mix(in srgb, var(--vh-primary) 55%, transparent);
+  font-weight: 600;
 }
 .score-pop {
   font-family: var(--font-arcade);
-  font-weight: 800;
+  font-weight: 600;
 }
 .score-pop[data-tier="warm"] {
-  text-shadow: 0 0 12px color-mix(in srgb, var(--vh-primary) 70%, transparent);
 }
 
 /* Big "ALMOST!" cue when the 500 tier is hit mid-call */
@@ -1303,13 +1346,10 @@ body::after {
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.6);
   font-family: var(--font-arcade);
-  font-weight: 900;
-  letter-spacing: 4px;
+  font-weight: 600;
+  letter-spacing: normal;
   font-size: clamp(30px, 7vw, 68px);
   color: var(--vh-primary);
-  text-shadow:
-    0 0 18px var(--vh-primary),
-    0 0 46px color-mix(in srgb, var(--vh-primary) 55%, transparent);
 }
 .score-cue.show {
   animation: cuePop 1.15s ease-out;
@@ -1323,8 +1363,10 @@ body::after {
 
 /* Result moment: big arcade win/lose */
 .result-badge {
-  font-family: var(--font-arcade);
-  letter-spacing: 3px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 .badge-win {
   box-shadow: 0 0 26px color-mix(in srgb, var(--vh-primary) 70%, transparent);
@@ -1334,18 +1376,15 @@ body::after {
 }
 .result-card h2 {
   font-family: var(--font-arcade);
-  letter-spacing: 1px;
-  text-transform: uppercase;
 }
 .result-score {
   font-family: var(--font-arcade);
-  font-weight: 900;
+  font-weight: 600;
   font-size: 46px;
-  text-shadow: 0 0 20px color-mix(in srgb, var(--vh-primary) 60%, transparent);
 }
 .result-who {
   font-family: var(--font-arcade);
-  letter-spacing: 1px;
+  letter-spacing: normal;
 }
 
 /* Confetti / FX canvas (win burst) */
@@ -1357,7 +1396,6 @@ body::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-cta { animation: none; }
   .score-cue.show { animation-duration: 0.01s; }
   .turn-pill[data-remaining="1"] { animation: none; }
   .heist-card.starter .heist-status { animation: none; }
@@ -1368,9 +1406,9 @@ body::after {
 .powered-by {
   text-align: center;
   padding: 12px 0 8px;
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 1.2px;
+  letter-spacing: normal;
   color: var(--vh-muted);
 }
 .powered-by span {
@@ -1385,18 +1423,17 @@ body::after {
   gap: 8px;
 }
 .score-hud-label {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 10px;
-  letter-spacing: 2px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--vh-muted);
 }
 .score-hud-value {
   font-family: var(--font-arcade);
   font-size: 22px;
-  font-weight: 800;
+  font-weight: 600;
   color: var(--vh-primary);
-  text-shadow: 0 0 12px color-mix(in srgb, var(--vh-primary) 55%, transparent);
 }
 .score-hud-pop {
   position: absolute;
@@ -1404,7 +1441,7 @@ body::after {
   top: -15px;
   font-family: var(--font-arcade);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
   color: var(--vh-primary);
   opacity: 0;
   pointer-events: none;
@@ -1465,9 +1502,9 @@ body::after {
   transform: translateY(0);
 }
 .hint-pop-kicker {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 2px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--vh-primary);
 }
@@ -1484,10 +1521,10 @@ body::after {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 1px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--vh-primary);
   background: color-mix(in srgb, var(--vh-primary) 10%, transparent);
@@ -1506,14 +1543,14 @@ body::after {
 .player-badge {
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 1px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #ffd45e;
-  background: color-mix(in srgb, #ffd45e 8%, transparent);
-  border: 1px solid color-mix(in srgb, #ffd45e 40%, transparent);
+  color: var(--color-yellow);
+  background: color-mix(in srgb, var(--color-yellow) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent);
   padding: 6px 12px;
   border-radius: 999px;
 }
@@ -1545,20 +1582,20 @@ body::after {
 /* ---- today's best: the score to beat, named while choosing a heist ---------- */
 .todays-best {
   margin: 8px 0 0;
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 12.5px;
-  letter-spacing: 0.4px;
+  letter-spacing: normal;
   text-align: left;
   color: var(--vh-muted);
-  border: 1px solid color-mix(in srgb, #ffd45e 40%, transparent);
-  background: color-mix(in srgb, #ffd45e 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent);
+  background: color-mix(in srgb, var(--color-yellow) 7%, transparent);
   border-radius: 999px;
   padding: 6px 14px;
   display: inline-block;
 }
 .todays-best strong {
-  color: #ffd45e;
-  font-weight: 700;
+  color: var(--color-yellow);
+  font-weight: 600;
 }
 .todays-best[hidden] {
   display: none;
@@ -1591,16 +1628,16 @@ body::after {
   padding: 0 10px;
 }
 .hb-title {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: clamp(11px, 0.72vw, 12.5px);
-  font-weight: 700;
-  letter-spacing: 1.4px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
-  color: #ffd45e;
+  color: var(--color-yellow);
 }
 .hb-link {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 11px;
   color: var(--vh-muted);
   text-decoration: none;
@@ -1625,16 +1662,16 @@ body::after {
   gap: 2px;
 }
 .rail-week-head {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 1.2px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--vh-muted);
   padding: 0 10px 2px;
 }
 .rail-week.current .rail-week-head {
-  color: #ffd45e;
+  color: var(--color-yellow);
 }
 .bd-row {
   display: grid;
@@ -1643,13 +1680,13 @@ body::after {
   gap: 10px;
   padding: 6px 10px;
   border-radius: 8px;
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: clamp(12.5px, 0.82vw, 13.5px);
   color: var(--vh-text);
 }
 .bd-rank {
   color: var(--vh-muted);
-  font-weight: 700;
+  font-weight: 600;
   text-align: center;
 }
 .bd-name {
@@ -1658,23 +1695,23 @@ body::after {
   white-space: nowrap;
 }
 .bd-score {
-  font-weight: 700;
+  font-weight: 600;
   color: var(--vh-primary);
 }
 .bd-row.gold .bd-name,
 .bd-row.gold .bd-score,
 .bd-row.gold .bd-rank {
-  color: #ffd45e;
+  color: var(--color-yellow);
 }
 /* Podium: #1 is a throne, not a table row. */
 .bd-row.gold {
   background: linear-gradient(
     90deg,
-    color-mix(in srgb, #ffd45e 18%, transparent),
-    color-mix(in srgb, #ffd45e 4%, transparent)
+    color-mix(in srgb, var(--color-yellow) 18%, transparent),
+    color-mix(in srgb, var(--color-yellow) 4%, transparent)
   );
-  border: 1px solid color-mix(in srgb, #ffd45e 35%, transparent);
-  box-shadow: 0 0 14px color-mix(in srgb, #ffd45e 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-yellow) 35%, transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--color-yellow) 12%, transparent);
   font-size: 14px;
   padding-top: 9px;
   padding-bottom: 9px;
@@ -1691,7 +1728,7 @@ body::after {
 .bd-sub {
   display: block;
   font-size: 10px;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--vh-muted);
 }
@@ -1729,8 +1766,8 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-dg-mono);
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-weight: 600;
   font-size: 15px;
   background: var(--vh-panel);
   border: 2px solid var(--vh-border);
@@ -1739,9 +1776,9 @@ body::after {
   width: 56px;
   height: 56px;
   font-size: 18px;
-  border-color: #ffd45e;
-  color: #ffd45e;
-  box-shadow: 0 0 18px color-mix(in srgb, #ffd45e 35%, transparent);
+  border-color: var(--color-yellow);
+  color: var(--color-yellow);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--color-yellow) 35%, transparent);
 }
 .pod-step.second .pod-medal {
   border-color: #cdd9e5;
@@ -1752,7 +1789,7 @@ body::after {
   color: #d8a06a;
 }
 .pod-name {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 11px;
   color: var(--vh-text);
   max-width: 100%;
@@ -1763,17 +1800,17 @@ body::after {
 .pod-score {
   font-family: var(--font-arcade);
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--vh-primary);
 }
 .pod-step.first .pod-score {
   font-size: 17px;
-  color: #ffd45e;
+  color: var(--color-yellow);
 }
 .pod-date {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 9.5px;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--vh-muted);
 }
@@ -1786,15 +1823,15 @@ body::after {
   justify-content: center;
   font-family: var(--font-arcade);
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 600;
   border: 1px solid var(--vh-border);
   border-bottom: none;
 }
 .pod-step.first .pod-block {
   height: 84px;
-  background: linear-gradient(180deg, color-mix(in srgb, #ffd45e 18%, transparent), transparent);
-  border-color: color-mix(in srgb, #ffd45e 40%, transparent);
-  color: #ffd45e;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-yellow) 18%, transparent), transparent);
+  border-color: color-mix(in srgb, var(--color-yellow) 40%, transparent);
+  color: var(--color-yellow);
 }
 .pod-step.second .pod-block {
   height: 56px;
@@ -1849,7 +1886,7 @@ body::after {
 .rail-live {
   margin-left: 6px;
   font-size: 9px;
-  letter-spacing: 1px;
+  letter-spacing: normal;
   color: var(--vh-primary);
   animation: pulse 2s ease-in-out infinite;
 }
@@ -1864,7 +1901,7 @@ body::after {
   margin-top: auto;
   padding: 10px 10px 4px;
   border-top: 1px dashed var(--vh-border);
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 12px;
   line-height: 1.45;
   color: var(--vh-muted);
@@ -1886,9 +1923,9 @@ body::after {
 
 /* ---- orb caption: name the tech at the moment it performs ------------------- */
 .orb-caption {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 10px;
-  letter-spacing: 2.5px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--vh-secondary);
   opacity: 0;
@@ -1914,11 +1951,11 @@ body::after {
 
 /* ---- connection chip: thinking state (masks reply latency) ------------------ */
 .conn-chip[data-state="thinking"] {
-  color: var(--color-dg-warning, #ffd45e);
+  color: var(--color-dg-warning, var(--color-yellow));
 }
 .conn-chip[data-state="thinking"] .conn-dot {
-  background: var(--color-dg-warning, #ffd45e);
-  box-shadow: 0 0 10px var(--color-dg-warning, #ffd45e);
+  background: var(--color-dg-warning, var(--color-yellow));
+  box-shadow: 0 0 10px var(--color-dg-warning, var(--color-yellow));
   animation: pulse 0.9s ease-in-out infinite;
 }
 
@@ -1927,9 +1964,9 @@ body::after {
    glow. Order (warm-up) keeps brand green; the ladder climbs blue → purple →
    gold. */
 .heist-card[data-level="order"] { --heist-accent: var(--vh-primary); }
-.heist-card[data-level="refund"] { --heist-accent: #14a9fb; }
-.heist-card[data-level="receptionist"] { --heist-accent: #ae63f9; }
-.heist-card[data-level="list"] { --heist-accent: #ffd45e; }
+.heist-card[data-level="refund"] { --heist-accent: var(--color-ring-blue); }
+.heist-card[data-level="receptionist"] { --heist-accent: var(--color-violet-3); }
+.heist-card[data-level="list"] { --heist-accent: var(--color-yellow); }
 .heist-card .heist-icon {
   background: color-mix(in srgb, var(--heist-accent, var(--vh-primary)) 14%, var(--vh-panel-2));
   border: 1px solid color-mix(in srgb, var(--heist-accent, var(--vh-primary)) 30%, transparent);
@@ -1950,7 +1987,7 @@ body::after {
   background: var(--vh-primary);
   color: var(--color-dg-on-solid);
   border-color: var(--vh-primary);
-  font-weight: 700;
+  font-weight: 600;
   box-shadow: 0 0 14px color-mix(in srgb, var(--vh-primary) 55%, transparent);
   animation: pulse 1.6s ease-in-out infinite;
 }
@@ -1959,10 +1996,9 @@ body::after {
 .result-rank {
   font-family: var(--font-arcade);
   font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: #ffd45e;
-  text-shadow: 0 0 12px color-mix(in srgb, #ffd45e 45%, transparent);
+  font-weight: 600;
+  letter-spacing: normal;
+  color: var(--color-yellow);
   margin: 0 0 12px;
 }
 .result-rank.newhigh {
@@ -1985,9 +2021,9 @@ body::after {
 
 /* The one to chase — turns the rank into a reason to play the next heist. */
 .result-rival {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 12.5px;
-  letter-spacing: 0.3px;
+  letter-spacing: normal;
   color: var(--vh-muted);
   border: 1px solid var(--vh-border);
   border-radius: 999px;
@@ -2023,7 +2059,7 @@ body::after {
 }
 .claim-lead {
   margin: 0 0 2px;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 14px;
   color: var(--vh-text);
 }
@@ -2061,9 +2097,9 @@ body::after {
 
 /* Itemized score breakdown under the result tally (turn/streak/sweep bonuses). */
 .result-bonus {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 12.5px;
-  letter-spacing: 0.3px;
+  letter-spacing: normal;
   color: var(--vh-primary);
   margin: -4px 0 12px;
 }
@@ -2090,19 +2126,19 @@ body::after {
 }
 /* The earned second chance reads as its own thing — gold, not brand green. */
 .result-retry {
-  border-color: color-mix(in srgb, #ffd45e 55%, transparent);
-  color: #ffd45e;
+  border-color: color-mix(in srgb, var(--color-yellow) 55%, transparent);
+  color: var(--color-yellow);
 }
 
 /* Topbar day-streak flame (registered players, 2+ consecutive days). */
 .streak-chip {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: #ffd45e;
-  border: 1px solid color-mix(in srgb, #ffd45e 40%, transparent);
-  background: color-mix(in srgb, #ffd45e 10%, transparent);
+  font-weight: 600;
+  letter-spacing: normal;
+  color: var(--color-yellow);
+  border: 1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent);
+  background: color-mix(in srgb, var(--color-yellow) 10%, transparent);
   border-radius: 999px;
   padding: 4px 10px;
   white-space: nowrap;
@@ -2113,9 +2149,9 @@ body::after {
 
 /* Lobby session-goal meter: "x/4 cracked today" → CLEAN SWEEP. */
 .sweep-meter {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 12px;
-  letter-spacing: 0.4px;
+  letter-spacing: normal;
   color: var(--vh-muted);
   border: 1px dashed var(--vh-border);
   border-radius: 999px;
@@ -2127,7 +2163,7 @@ body::after {
   color: var(--color-dg-on-solid);
   background: var(--vh-primary);
   border: 1px solid var(--vh-primary);
-  font-weight: 700;
+  font-weight: 600;
   box-shadow: 0 0 14px color-mix(in srgb, var(--vh-primary) 55%, transparent);
 }
 .sweep-meter[hidden] {
@@ -2136,29 +2172,29 @@ body::after {
 
 /* Retry card state: busted, but the earned second chance re-opens it. */
 .heist-card.retry {
-  border-color: color-mix(in srgb, #ffd45e 55%, transparent);
+  border-color: color-mix(in srgb, var(--color-yellow) 55%, transparent);
 }
 .heist-card.retry .heist-status {
-  background: #ffd45e;
+  background: var(--color-yellow);
   color: var(--color-dg-charcoal, #1a1a1f);
-  border-color: #ffd45e;
-  font-weight: 700;
-  box-shadow: 0 0 14px color-mix(in srgb, #ffd45e 55%, transparent);
+  border-color: var(--color-yellow);
+  font-weight: 600;
+  box-shadow: 0 0 14px color-mix(in srgb, var(--color-yellow) 55%, transparent);
   animation: pulse 1.6s ease-in-out infinite;
 }
 .heist-card.retry .heist-locked {
   display: block;
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.4px;
-  color: #ffd45e;
+  letter-spacing: normal;
+  color: var(--color-yellow);
 }
 
 /* Day-complete summary card: reuses the result-card skeleton. */
 .day-card #dayCracked {
   color: var(--vh-text);
-  font-family: var(--font-dg-mono);
-  letter-spacing: 0.5px;
+  font-family: var(--font-mono);
+  letter-spacing: normal;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2173,15 +2209,15 @@ body::after {
 .bd-badge {
   margin-left: 5px;
   font-size: 11px;
-  letter-spacing: 0;
+  letter-spacing: normal;
 }
 
 /* Rank movement since the player's last visit. */
 .bd-delta {
   margin-left: 6px;
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  font-weight: 600;
+  letter-spacing: normal;
 }
 .bd-delta.up {
   color: var(--vh-primary);
@@ -2194,8 +2230,8 @@ body::after {
 .bd-gap {
   grid-column: 2 / 4;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
+  font-weight: 600;
+  letter-spacing: normal;
   color: var(--vh-primary);
 }
 
@@ -2204,7 +2240,7 @@ body::after {
   text-align: center;
   color: var(--vh-muted);
   font-size: 10px;
-  letter-spacing: 4px;
+  letter-spacing: normal;
   padding: 2px 0;
   user-select: none;
 }
@@ -2215,7 +2251,7 @@ body::after {
   padding: 7px 10px;
   border-radius: 8px;
   border: 1px dashed color-mix(in srgb, var(--vh-primary) 30%, transparent);
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 11.5px;
   line-height: 1.4;
   color: var(--vh-text);
@@ -2231,9 +2267,9 @@ body::after {
 
 /* Daily-reset countdown in the rail head. */
 .hb-reset {
-  font-family: var(--font-dg-mono);
+  font-family: var(--font-mono);
   font-size: 10.5px;
-  letter-spacing: 0.5px;
+  letter-spacing: normal;
   color: var(--vh-muted);
   white-space: nowrap;
 }
@@ -2246,3 +2282,17 @@ body::after {
     animation: none;
   }
 }
+
+/* ---- kit glass (last, so it wins over the panel defaults above) ---------- */
+/* Panels on the stage are the kit's glass: frosted white/5 over the texture. */
+.heist-card,
+.board-rail {
+  background: rgb(255 255 255 / 0.05);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-radius: 1.5rem;
+}
+.heist-card:hover:not(:disabled) {
+  background: rgb(255 255 255 / 0.1);
+}
+

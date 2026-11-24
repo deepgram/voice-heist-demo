@@ -203,7 +203,7 @@ export function setTurn(current, max) {
   for (let i = 0; i < max; i++) dots += i < used ? "\u25CF" : "\u25CB";
   // Turns ARE the tension mechanic (there's no timer) \u2014 style them like one:
   // the label escalates on the final turn and the pill pops when a turn burns.
-  const label = remaining === 1 ? "Last turn!" : `Turn ${used} of ${max}`;
+  const label = remaining === 1 ? "Last turn" : `Turn ${used} of ${max}`;
   els.turnPill.innerHTML = `<span class="turn-dots">${dots}</span><span>${label}</span>`;
   els.turnPill.dataset.remaining = String(remaining);
   els.turnPill.classList.remove("hidden");
@@ -237,7 +237,7 @@ export function setTotalScore(total, delta = 0, label = "") {
     _scorePopTimer = setTimeout(() => els.scoreHudPop.classList.remove("show"), 1100);
   }
   // Hitting the 500 "almost correct" tier earns a big arcade cue.
-  if (label === "warm" && delta > 0) showScoreCue("ALMOST!");
+  if (label === "warm" && delta > 0) showScoreCue("Almost.");
 }
 
 // ---- day streak chip (topbar) ----------------------------------------------
@@ -263,7 +263,7 @@ export function setSweepMeter(cracked, total) {
   els.sweepMeter.textContent = swept
     ? "\u{1F3C6} CLEAN SWEEP — every heist cracked today"
     : `${cracked}/${total} cracked today` +
-      (cracked === total - 1 ? " — one more for the +1,000 sweep bonus!" : "");
+      (cracked === total - 1 ? " — one more for the +1,000 sweep bonus." : "");
   els.sweepMeter.dataset.swept = String(swept);
   els.sweepMeter.hidden = false;
 }
@@ -937,7 +937,7 @@ function wireShare(btn) {
     try {
       await navigator.clipboard.writeText(`${_shareText} ${url}`);
       clearTimeout(restoreTimer);
-      btn.textContent = "Copied!";
+      btn.textContent = "Copied";
       restoreTimer = setTimeout(() => {
         btn.textContent = idleLabel;
       }, 1600);
@@ -977,8 +977,8 @@ export function showResult({
   base, turnBonus, turnsLeft, streakBonus, streak, sweep, sweepBonus,
   retrySpent, retryOffer,
 }) {
-  els.resultBadge.textContent = sweep ? "★ CLEAN SWEEP ★"
-    : outcome === "win" ? "HEIST CRACKED" : "BUSTED";
+  els.resultBadge.textContent = sweep ? "★ Clean sweep ★"
+    : outcome === "win" ? "Heist cracked" : "Busted";
   els.resultBadge.className = `result-badge ${outcome === "win" ? "badge-win" : "badge-lose"}`;
   els.overlay.dataset.outcome = outcome; // drives the bust flash / win styling
   els.resultTitle.textContent = title;
@@ -1157,10 +1157,10 @@ export function showDaySummary({
 }) {
   if (!els.dayOverlay) return Promise.resolve(undefined);
   els.dayTitle.textContent = onBoard && codename
-    ? `That's the day, ${codename}!` : "That's the day!";
+    ? `That’s the day, ${codename}.` : "That’s the day.";
   countUp(els.dayScore, Number(dayTotal) || 0);
   els.dayCracked.textContent =
-    `${cracked}/${of} heists cracked${cracked === of ? " — clean sweep!" : ""}`;
+    `${cracked}/${of} heists cracked${cracked === of ? " — clean sweep" : ""}`;
   if (els.dayRank) {
     let rankText = "";
     if (rank && onBoard) rankText = rank === 1 ? "★ #1 on today's board ★" : `#${rank} on today's board`;

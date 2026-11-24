@@ -1,18 +1,5 @@
-// Self-hosted fonts (no CDN: the arcade identity must survive conference Wi-Fi).
-import "@fontsource/inter/400.css";
-import "@fontsource/inter/500.css";
-import "@fontsource/inter/600.css";
-import "@fontsource/inter/700.css";
-import "@fontsource/fira-code/500.css";
-import "@fontsource/fira-code/600.css";
-import "@fontsource/noto-sans/500.css";
-import "@fontsource/noto-sans/600.css";
-import "@fontsource/noto-sans/700.css";
-import "@fontsource/orbitron/600.css";
-import "@fontsource/orbitron/700.css";
-import "@fontsource/orbitron/800.css";
-import "@fontsource/orbitron/900.css";
-import "@deepgram/styles"; // Deepgram design system: tokens, base, components
+// Fonts (Work Sans, Azeret Mono) come from the kit's /vdui/brand.css, linked in index.html.
+import "@deepgram/styles"; // base reset + .dg-btn/.dg-card structure; tokens remapped to the kit in styles.css
 import "./styles.css"; // our layout, imported after so it can layer on top
 import { Game } from "./game.js";
 import * as ui from "./ui.js";
