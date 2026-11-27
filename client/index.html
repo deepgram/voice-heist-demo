@@ -18,15 +18,17 @@
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="/og-card.png" />
-    <!-- Fonts are self-hosted via @fontsource (imported in src/main.js) so the
-         arcade identity survives conference Wi-Fi with no CDN dependency. -->
+    <!-- Deepgram brand UI kit (@deepgram-devs/dg-brand-ui, copied into
+         public/vdui): tokens, Work Sans + Azeret Mono, and the voice ring. -->
+    <link rel="stylesheet" href="/vdui/brand.css" />
+    <script src="/vdui/ring-element/deepgram-voice-ring.js"></script>
   </head>
   <body>
     <div id="app" data-phase="lobby" data-connected="false">
       <header class="topbar">
         <div class="brand">
           <span class="brand-mark">&#9673;</span>
-          <span class="brand-name">VOICE HEIST</span>
+          <span class="brand-name">Voice Heist</span>
         </div>
         <div id="scoreHud" class="score-hud" aria-live="polite" hidden>
           <span class="score-hud-label">Score</span>
@@ -57,7 +59,7 @@
         <!-- Hero: the orb + agent + primary action (always visible) -->
         <section class="hero">
           <div class="orb-stack">
-            <canvas id="orb" width="320" height="320" aria-hidden="true"></canvas>
+            <deepgram-voice-ring id="orb" state="listening" aria-hidden="true"></deepgram-voice-ring>
           </div>
           <!-- Names the tech at the moment it performs: visible while an agent speaks. -->
           <div class="orb-caption" aria-hidden="true">Live on Deepgram Voice Agent</div>
@@ -164,7 +166,7 @@
         </section>
       </main>
 
-      <div class="powered-by">Powered by <img src="/deepgram-wordmark.svg" alt="Deepgram" class="dg-wordmark" /> <span>Voice Agent API</span></div>
+      <div class="powered-by">Powered by <img src="/vdui/logos/deepgram.svg" alt="Deepgram" class="dg-wordmark" /> <span>Voice Agent API</span></div>
 
       <!-- Heist-start cue: names the one rule of the game (say anything!) with
            the themed quote beneath as the nudge. -->
@@ -215,7 +217,7 @@
          come back tomorrow. -->
     <div id="dayOverlay" class="overlay hidden">
       <div class="result-card dg-card day-card" role="dialog" aria-modal="true" aria-labelledby="dayTitle">
-        <div class="result-badge badge-win">THAT'S THE DAY</div>
+        <div class="result-badge badge-win">That’s the day</div>
         <h2 id="dayTitle"></h2>
         <div id="dayScore" class="result-score"></div>
         <p id="dayCracked" class="result-rank"></p>
@@ -285,7 +287,7 @@
     <div id="loginOverlay" class="overlay hidden">
       <div class="auth-card dg-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
         <button id="authClose" class="auth-close" type="button" aria-label="Close">&times;</button>
-        <div class="auth-brand"><span class="brand-mark">&#9673;</span> VOICE HEIST</div>
+        <div class="auth-brand"><span class="brand-mark">&#9673;</span> Voice Heist</div>
         <h2 id="authTitle">Get your name on the board</h2>
         <p class="auth-sub" id="authSub">Pick a handle and today's scores count under your codename &mdash; each week's top heister takes the Mastermind's Cut, the weekly prize.</p>
         <form id="quickForm" class="auth-form auth-form--stack">

@@ -1,17 +1,11 @@
+import "./fonts.js";
 // Public arcade HIGH SCORES board (anyone with the URL). No game/audio deps —
 // polls /api/leaderboard and renders a gamer-first layout: TODAY'S RACE as the
 // hero (live score bars, badges, YOU highlight, movement flashes), the all-time
 // podium + latest-cracks pulse in the side rail, and previous days demoted to a
 // compact history strip.
 
-// Self-hosted fonts (no CDN: the page must look right on conference Wi-Fi).
-import "@fontsource/inter/500.css";
-import "@fontsource/inter/700.css";
-import "@fontsource/inter/800.css";
-import "@fontsource/orbitron/600.css";
-import "@fontsource/orbitron/700.css";
-import "@fontsource/orbitron/800.css";
-import "@fontsource/orbitron/900.css";
+// Fonts come from the kit's /vdui/brand.css, linked in leaderboard.html.
 
 const REFRESH_MS = 15000;
 const RANK = { 1: "\u{1F451}", 2: "\u{1F948}", 3: "\u{1F949}" }; // 👑 🥈 🥉
@@ -79,7 +73,7 @@ function renderReset() {
   const h = Math.floor(ms / 3600000);
   const m = Math.floor((ms % 3600000) / 60000);
   els.reset.textContent =
-    ms <= 60000 ? "RESETS ANY MOMENT" : h > 0 ? `RESETS IN ${h}H ${m}M` : `RESETS IN ${m}M`;
+    ms <= 60000 ? "Resets any moment" : h > 0 ? `Resets in ${h}h ${m}m` : `Resets in ${m}m`;
 }
 setInterval(renderReset, 30000);
 
@@ -96,7 +90,7 @@ function todayRowHtml(e, top, flash) {
   return `<div class="trow${e.rank === 1 ? " first" : ""}${mine ? " mine" : ""}${flash ? " up-flash" : ""}" data-rank="${e.rank}">
     <div class="trank">${RANK[e.rank] || e.rank}</div>
     <div class="tmain">
-      <div class="tname"><span class="nm">${escapeHtml(e.codename)}</span>${badgeHtml(e.badges)}${mine ? '<span class="you">· YOU</span>' : ""}</div>
+      <div class="tname"><span class="nm">${escapeHtml(e.codename)}</span>${badgeHtml(e.badges)}${mine ? '<span class="you label">· You</span>' : ""}</div>
       <div class="tbar"><i style="--w:${pct}%"></i></div>
     </div>
     <div class="tscore">${Number(e.score).toLocaleString()}</div>
@@ -105,11 +99,11 @@ function todayRowHtml(e, top, flash) {
 
 function renderToday(entries, prevChampion) {
   if (!entries.length) {
-    els.todayRows.innerHTML = `<div class="today-empty">NO SCORES YET TODAY — BE THE FIRST!${
+    els.todayRows.innerHTML = `<div class="today-empty">No scores yet today. Be the first.${
       prevChampion
         ? `<br>${escapeHtml(prevChampion.codename)} set yesterday's bar at ${Number(prevChampion.score).toLocaleString()}.`
         : ""
-    }<br><a class="play-link today-cta" href="/game" style="display:inline-block;margin-top:14px">&#9654; PLAY NOW</a></div>`;
+    }<br><a class="play-link today-cta label" href="/game" style="margin-top:14px">&#9654; Play now</a></div>`;
     prevOrder = [];
     return;
   }
@@ -190,14 +184,14 @@ function renderHistory(days, today) {
       const mine = myCodename && e.codename === myCodename;
       return `<div class="hrow${mine ? " mine" : ""}">
         <span class="hrank">${RANK[e.rank] || e.rank}</span>
-        <span class="hname">${escapeHtml(e.codename)}${mine ? '<span class="you">· YOU</span>' : ""}</span>
+        <span class="hname">${escapeHtml(e.codename)}${mine ? '<span class="you label">· You</span>' : ""}</span>
         <span class="hscore">${Number(e.score).toLocaleString()}</span>
       </div>`;
     }).join("");
     const more = d.entries.length > 3
-      ? `<div class="hmore">+${d.entries.length - 3} MORE HEISTER${d.entries.length - 3 === 1 ? "" : "S"}</div>`
+      ? `<div class="hmore label">+${d.entries.length - 3} more heister${d.entries.length - 3 === 1 ? "" : "s"}</div>`
       : "";
-    return `<div class="hday"><div class="hdate">${fmtDate(d.day)}</div>${rows}${more}</div>`;
+    return `<div class="hday"><div class="hdate label">${fmtDate(d.day)}</div>${rows}${more}</div>`;
   }).join("");
 }
 
@@ -217,9 +211,9 @@ async function refresh() {
       resetAt = Date.now() + resetInSec * 1000;
       renderReset();
     }
-    els.updated.textContent = "UPDATED " + new Date().toLocaleTimeString();
+    els.updated.textContent = "Updated " + new Date().toLocaleTimeString();
   } catch {
-    els.updated.textContent = "RECONNECTING…";
+    els.updated.textContent = "Reconnecting…";
   }
 }
 

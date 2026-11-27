@@ -1,3 +1,4 @@
+import "./fonts.js";
 // Admin portal — event controls for the Deepgram team.
 // The page is inert without a valid vh_admin cookie; all data/actions are
 // guarded server-side by require_admin. This just drives the UI.
@@ -134,7 +135,7 @@ async function copyText(text, btn) {
     ta.remove();
   }
   const prev = btn.textContent;
-  btn.textContent = "Copied!";
+  btn.textContent = "Copied";
   setTimeout(() => (btn.textContent = prev), 1400);
 }
 
