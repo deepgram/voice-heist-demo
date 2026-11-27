@@ -1,6 +1,6 @@
 # Fly.io config for Voice Heist.
 # Rename the app to deploy your own copy (`fly apps create <your-name>`).
-app = "voice-heist-demo"
+app = "voice-heist-fun"
 primary_region = "iad"
 
 [build]
